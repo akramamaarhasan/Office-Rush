@@ -3999,21 +3999,15 @@
       }
 
       applyCustomization();
+      updateMenuPersonalBest();
+      syncPersonalBestFromCloud(state.username);
       updateMusicToggleLabel();
+      fetchLeaderboard();
       updateHud();
       if (musicEnabled) {
         startMenuMusic();
       }
       startVisibleLoop();
-
-      // Leaderboard/personal-best features need the authenticated playerId first.
-      (async () => {
-        await ensureAuthenticatedPlayerId();
-        updateMenuPersonalBest();
-        await cleanupPollutedPersonalBest();
-        await syncPersonalBestFromCloud(state.username);
-        fetchLeaderboard();
-      })();
     </script>
   </body>
 </html>

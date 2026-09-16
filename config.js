@@ -1,2 +1,2 @@
 window.__ENV__ = window.__ENV__ || {};
-window.__ENV__.FIREBASE_API_KEY = window.__ENV__.FIREBASE_API_KEY || "AIzaSyA_w10ohFI7ql4YcvC4PocFiS-a-_f1p1M";
+window.__ENV__.FIREBASE_API_KEY = window.__ENV__.FIREBASE_API_KEY || "AIzaSyD4ys5vgvzAkxi6el9SW2v8ljdL2ECxJ5g";
