@@ -2156,6 +2156,7 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
       const env = window.__ENV__ || {};
       const firebaseConfig = {
@@ -2170,6 +2171,7 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      const auth = getAuth(app);
 
       const gameArea = document.getElementById('game-area');
       const runnerEl = document.getElementById('runner');
@@ -2205,23 +2207,23 @@
       let animationFrameId = null;
       const rememberedUsernameKey = 'officeRushUsername';
       const personalBestKeyPrefix = 'officeRushPersonalBest:';
-      const playerIdKey = 'officeRushPlayerId';
 
-      function getPersistentPlayerId() {
+      // playerId is set to the Firebase Anonymous Auth UID once sign-in resolves (see
+      // ensureAuthenticatedPlayerId below). Unlike a client-generated random string, this
+      // UID is verified server-side by Firestore, so it can't be spoofed by copying a
+      // value out of another player's leaderboard entry.
+      let playerId = null;
+
+      async function ensureAuthenticatedPlayerId() {
         try {
-          const storedPlayerId = localStorage.getItem(playerIdKey);
-          if (storedPlayerId) return storedPlayerId;
-
-          const newPlayerId = window.crypto?.randomUUID?.()
-            || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-          localStorage.setItem(playerIdKey, newPlayerId);
-          return newPlayerId;
+          const userCredential = await signInAnonymously(auth);
+          playerId = userCredential.user.uid;
         } catch (error) {
-          return `temporary-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          console.error('Anonymous sign-in failed, falling back to a local-only id:', error);
+          playerId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
         }
+        return playerId;
       }
-
-      const playerId = getPersistentPlayerId();
 
       const hairStyleGrid = document.getElementById('hair-style-grid');
       const hairColorGrid = document.getElementById('hair-color-grid');
@@ -2967,12 +2969,33 @@
         menuPersonalBestValue.textContent = String(getPersonalBest());
       }
 
-      // Pulls the highest score saved under this username from any device, so personal best follows the player, not the browser.
-      async function syncPersonalBestFromCloud(name) {
-        const trimmedName = (name || '').trim();
-        if (!trimmedName) return;
+      // One-time fix for the "Guest" cloud-sync bug: any personal best without a matching
+      // leaderboard entry for this device's playerId was never actually earned here, so clear it.
+      async function cleanupPollutedPersonalBest() {
+        const cleanupFlagKey = 'officeRushPersonalBestCleanupV1';
         try {
-          const cloudQuery = query(collection(db, "leaderboard"), where("name", "==", trimmedName));
+          if (localStorage.getItem(cleanupFlagKey)) return;
+          localStorage.setItem(cleanupFlagKey, '1');
+
+          if (getPersonalBest() <= 0) return;
+
+          const playerScoreQuery = query(collection(db, "leaderboard"), where("playerId", "==", playerId));
+          const snapshot = await getDocs(playerScoreQuery);
+          if (snapshot.empty) {
+            localStorage.removeItem(getPersonalBestStorageKey());
+            updateMenuPersonalBest();
+          }
+        } catch (error) {
+          console.warn('Unable to run personal best cleanup:', error);
+        }
+      }
+
+      // Pulls this device's highest submitted score from the cloud (keyed by playerId, not
+      // username) as a safety net if local storage was cleared. Never matches by name, since
+      // different real players can share the same display name.
+      async function syncPersonalBestFromCloud(name) {
+        try {
+          const cloudQuery = query(collection(db, "leaderboard"), where("playerId", "==", playerId));
           const snapshot = await getDocs(cloudQuery);
           let cloudBest = 0;
           snapshot.forEach((doc) => {
@@ -2990,6 +3013,15 @@
 
       async function saveScoreToFirebase(name, score) {
         if (state.scoreSubmitted) return;
+
+        // Sanity cap: reject scores no legitimate run could reach. This only blocks
+        // accidental bugs, not a determined attacker bypassing the client entirely —
+        // the real fix is restricting writes in Firestore Security Rules.
+        const MAX_PLAUSIBLE_SCORE = 100000;
+        if (!Number.isFinite(score) || score < 0 || score > MAX_PLAUSIBLE_SCORE) {
+          console.warn('Refusing to submit implausible score:', score);
+          return;
+        }
 
         state.scoreSubmitted = true;
 
@@ -3967,15 +3999,21 @@
       }
 
       applyCustomization();
-      updateMenuPersonalBest();
-      syncPersonalBestFromCloud(state.username);
       updateMusicToggleLabel();
-      fetchLeaderboard();
       updateHud();
       if (musicEnabled) {
         startMenuMusic();
       }
       startVisibleLoop();
+
+      // Leaderboard/personal-best features need the authenticated playerId first.
+      (async () => {
+        await ensureAuthenticatedPlayerId();
+        updateMenuPersonalBest();
+        await cleanupPollutedPersonalBest();
+        await syncPersonalBestFromCloud(state.username);
+        fetchLeaderboard();
+      })();
     </script>
   </body>
 </html>
