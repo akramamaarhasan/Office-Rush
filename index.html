@@ -163,7 +163,8 @@
       }
 
       .chip.music-toggle,
-      .chip.pause-toggle {
+      .chip.pause-toggle,
+      .chip.awareness-help-toggle {
         position: relative;
         padding: 0 10px;
         min-width: 52px;
@@ -176,6 +177,41 @@
         color: var(--text);
       }
 
+      .awareness-help-toggle::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        z-index: 40;
+        width: max-content;
+        max-width: 220px;
+        padding: 7px 9px;
+        background: #0d1722;
+        border: 2px solid #bfe6ff;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+        color: var(--text);
+        font-size: 0.68rem;
+        line-height: 1.25;
+        text-align: left;
+        white-space: normal;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-3px);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+      }
+
+      .awareness-help-toggle:hover::after,
+      .awareness-help-toggle:focus-visible::after,
+      .awareness-help-toggle.is-tooltip-visible::after {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .awareness-help-toggle.is-tooltip-dismissed::after {
+        opacity: 0;
+        transform: translateY(-3px);
+      }
+
       .chip.music-toggle:focus {
         outline: none;
       }
@@ -184,11 +220,18 @@
         outline: none;
       }
 
+      .chip.awareness-help-toggle:focus,
+      .chip.awareness-help-toggle:focus-visible {
+        outline: none;
+      }
+
       .chip.music-toggle span,
-      .chip.pause-toggle span {
+      .chip.pause-toggle span,
+      .chip.awareness-help-toggle span {
         position: relative;
         z-index: 1;
         font-size: 1.15rem;
+        font-weight: 700;
         line-height: 1;
       }
 
@@ -1216,7 +1259,7 @@
         filter:
           drop-shadow(0 2px 0 rgba(36, 6, 12, 0.8))
           drop-shadow(2px 3px 0 rgba(36, 6, 12, 0.35))
-          drop-shadow(0 0 5px rgba(255, 142, 161, 0.28))
+          drop-shadow(0 0 5px rgba(57, 255, 110, 0.28))
             drop-shadow(0 0 1px var(--secondary))
             drop-shadow(0 0 5px var(--secondary));
       }
@@ -1493,6 +1536,11 @@
         font: inherit;
       }
 
+      .awareness-chip:focus,
+      .awareness-chip:focus-visible {
+        outline: none;
+      }
+
       .awareness-chip .chip-label {
         position: absolute;
         width: 1px;
@@ -1604,11 +1652,11 @@
         place-items: center;
         min-height: 82px;
         padding: 0.75rem;
-        border: 3px solid #67e8ff;
+        border: 3px solid #39ff6e;
         background: rgba(15, 23, 42, 0.7);
         box-shadow:
-          0 0 0 2px rgba(103, 232, 255, 0.35),
-          inset 0 0 18px rgba(103, 232, 255, 0.16);
+          0 0 0 2px rgba(57, 255, 110, 0.35),
+          inset 0 0 18px rgba(57, 255, 110, 0.16);
       }
 
       .awareness-preview .obstacle {
@@ -2162,6 +2210,11 @@
         color: #08212b;
       }
 
+      #close-awareness-button {
+        background: #79f2b3;
+        color: #0c1d1a;
+      }
+
       .awareness-panel .action-btn {
         display: flex;
         width: 100%;
@@ -2411,6 +2464,9 @@
               <div class="control-row">
                 <button class="chip pause-toggle" id="pause-toggle" type="button" aria-label="Pause game" aria-pressed="false">
                   <span aria-hidden="true"></span>
+                </button>
+                <button class="chip awareness-help-toggle" id="awareness-help-toggle" type="button" aria-label="Press to learn about a nearby green-glowing obstacle" data-tooltip="Wait for a green-glowing obstacle, then press this button or the obstacle to learn about it.">
+                  <span aria-hidden="true">?</span>
                 </button>
                 <button class="chip music-toggle" id="music-toggle" type="button" aria-label="Mute sound" aria-pressed="false">
                   <span aria-hidden="true">♫</span>
@@ -2663,6 +2719,7 @@
       const scoreValue = document.getElementById('score-value');
       const playerDisplay = document.getElementById('player-display');
       const musicToggle = document.getElementById('music-toggle');
+      const awarenessHelpToggle = document.getElementById('awareness-help-toggle');
       const pauseToggle = document.getElementById('pause-toggle');
       const startScreen = document.getElementById('start-screen');
       const howToPlayScreen = document.getElementById('how-to-play-screen');
@@ -2699,10 +2756,12 @@
       let musicInterval = null;
       let musicGainNode = null;
       let activeMusicMode = null;
+      const activeMusicSources = new Set();
       const MAX_MUSIC_GAIN = 0.16;
       let animationFrameId = null;
       let obstacleCountAnimationId = null;
       let awarenessCountdownTimer = null;
+      let awarenessHelpTooltipTimer = null;
       const rememberedUsernameKey = 'officeRushUsername';
       const personalBestKeyPrefix = 'officeRushPersonalBest:';
 
@@ -3007,6 +3066,7 @@
         airJumpsLeft: 1,
         jumpBufferRemaining: 0,
         fastDropJumpGraceRemaining: 0,
+        startupInputGuard: false,
         scoreSubmitted: false,
         obstaclesAvoided: 0,
         runner: {
@@ -3024,6 +3084,15 @@
         nextAwarenessScoreTarget: Math.round(1000 + Math.random() * 1000),
         startActionLockUntil: 0
       };
+
+      const heldInputKeys = new Set();
+      const blockedMenuJumpKeys = new Set();
+
+      function clearActiveInputState() {
+        heldInputKeys.clear();
+        state.jumpBufferRemaining = 0;
+        state.fastDropJumpGraceRemaining = 0;
+      }
       
       function playJumpSound() {
         try {
@@ -3196,6 +3265,14 @@
           clearInterval(musicInterval);
           musicInterval = null;
         }
+        activeMusicSources.forEach((source) => {
+          try {
+            source.stop();
+          } catch (error) {
+            // The source may already have finished.
+          }
+        });
+        activeMusicSources.clear();
         activeMusicMode = null;
         if (musicGainNode && audioCtx) {
           musicGainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
@@ -3244,6 +3321,8 @@
           osc.connect(gainNode);
           gainNode.connect(musicGainNode);
 
+          activeMusicSources.add(osc);
+          osc.addEventListener('ended', () => activeMusicSources.delete(osc), { once: true });
           osc.start(now);
           osc.stop(now + duration);
         };
@@ -3332,6 +3411,8 @@
             pulseGain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.11);
             pulse.connect(pulseGain);
             pulseGain.connect(musicGainNode);
+            activeMusicSources.add(pulse);
+            pulse.addEventListener('ended', () => activeMusicSources.delete(pulse), { once: true });
             pulse.start(now + offset);
             pulse.stop(now + offset + 0.11);
           });
@@ -3549,182 +3630,182 @@
         'Flying Stapler': {
           title: 'Flying Stapler',
           kind: 'airborne',
-          effect: 'It flies across the room like a fast office hazard. If you touch it, the run ends instantly.',
-          example: 'This is the main airborne threat: fast, narrow, and easy to miss until it is too late.'
+          effect: 'Keep your head up for stray desk projectiles soaring across the room!',
+          example: 'Touching this obstacle ends the run.'
         },
         'Bills Due': {
           title: 'Bills Due',
           kind: 'ground',
-          effect: 'A ground obstacle that behaves like a sudden finance trap: contact ends the run and your score is lost.',
-          example: 'Look at the label and avoid the blocked lane before it reaches you.'
+          effect: 'Always stay on top of your financial due dates before they overwhelm you.',
+          example: 'Touching this obstacle ends the run.'
         },
         'Urgent Email': {
           title: 'Urgent Email',
           kind: 'ground',
-          effect: 'A notification hazard that looks harmless but still hits your run on contact.',
-          example: 'It is a text-based warning sign at floor level; jump or clear the lane in time.'
+          effect: 'Stay on top of your emails or Gerald is going to nag at you!',
+          example: 'Touching this obstacle ends the run.'
         },
         'Printer Jam': {
           title: 'Printer Jam',
           kind: 'ground',
-          effect: 'This is a loud office failure on the ground. It blocks your path and ends contact on impact.',
-          example: 'Treat it like any floor trap: avoid or misjudge it and you will fail.'
+          effect: 'The office machinery is striking again; The shared office printer decided to break down right when you needed it the most!',
+          example: 'Touching this obstacle ends the run.'
         },
         'Card Declined': {
           title: 'Card Declined',
           kind: 'ground',
-          effect: 'This is a stress hazard that appears in the lane. It is not a reward object; it is a collision risk.',
-          example: 'The red object is a warning, not a collectible.'
+          effect: 'Trying to buy lunch only to realize your card did not go through in front of everyone... Awkward!',
+          example: 'Touching this obstacle ends the run.'
         },
         'Gas Prices': {
           title: 'Gas Prices',
           kind: 'ground',
           effect: 'This ground obstacle represents rising cost pressure. Contact ends the run.',
-          example: 'If you are unsure, think of it as a dangerous block that must be avoided.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Out of Coffee': {
           title: 'Out of Coffee',
           kind: 'ground',
           effect: 'A coffee-related hazard that looks like a visual challenge but still counts as a deadly obstacle.',
-          example: 'Do not confuse the icon with a pickup. It is a danger marker.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Keyboard Spill': {
           title: 'Keyboard Spill',
           kind: 'ground',
           effect: 'A messy floor trap: the lane becomes dangerous and any collision removes the run.',
-          example: 'This hazard needs the same respect as any blocked obstacle on the ground.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Missed Alarm': {
           title: 'Missed Alarm',
           kind: 'ground',
           effect: 'A time-pressure alarm that appears as a wall-like obstacle. Touching it ends the run.',
-          example: 'The symbol is a warning, not a power-up.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Parking Ticket': {
           title: 'Parking Ticket',
           kind: 'ground',
           effect: 'A ground blocker representing a ticket penalty. It is a collision danger.',
-          example: 'Keep your lane clear; this item is not safe to touch.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Traffic Jam': {
           title: 'Traffic Jam',
           kind: 'ground',
           effect: 'A dense obstruction that blocks the path. The correct response is dodging or jumping clear.',
-          example: 'Even if it reads like a story prompt, it still kills on impact.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Late Meeting': {
           title: 'Late Meeting',
           kind: 'ground',
           effect: 'A meeting reminder shaped like a hazard. It is safe only when you avoid it.',
-          example: 'This is a collision trap disguised as office panic.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Laptop Dead': {
           title: 'Laptop Dead',
           kind: 'ground',
           effect: 'A broken laptop hazard on the floor. Touching it ends the run immediately.',
-          example: 'Treat red floor objects as lethal even if they sound like office drama.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Unstable Wi-Fi': {
           title: 'Unstable Wi-Fi',
           kind: 'ground',
           effect: 'A signal issue hazard that sits in the running lane and ends the run on impact.',
-          example: 'If it is red and labeled, it is a danger object.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Unpaid Overtime': {
           title: 'Unpaid Overtime',
           kind: 'ground',
           effect: 'A work stress obstacle built like a wall. Collision ends the run.',
-          example: 'Do not mistake the theme for a bonus.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Cold Lunch': {
           title: 'Cold Lunch',
           kind: 'ground',
           effect: 'A floor obstacle disguised as a lunch reminder. It still hurts on contact.',
-          example: 'Distraction does not make it safe.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Clogged Toilet': {
           title: 'Clogged Toilet',
           kind: 'ground',
           effect: 'A messy and extreme floor hazard. It will end your run if you hit it.',
-          example: 'The label is a joke, but the collision is real.'
+          example: 'Touching this obstacle ends the run.'
         },
         'CAPTCHAs': {
           title: 'CAPTCHAs',
           kind: 'ground',
           effect: 'A digital annoyance hazard on the ground. It is a delay trap and a collision risk.',
-          example: 'Do not try to "solve" it in the lane; avoid it instead.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Low Battery': {
           title: 'Low Battery',
           kind: 'ground',
           effect: 'A warning object that still counts as a collision hazard at floor level.',
-          example: 'It is not helpful; it is a threat.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Spam Call': {
           title: 'Spam Call',
           kind: 'ground',
           effect: 'An office distraction turned deadly. If you touch it, the run ends.',
-          example: 'This hazard is loud in theme but lethal in gameplay.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Paper Cut': {
           title: 'Paper Cut',
           kind: 'ground',
           effect: 'A small but real obstacle: contact ends the run even if the idea feels harmless.',
-          example: 'Do not judge it by the theme; judge it by the red danger status.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Deadlines': {
           title: 'Deadlines',
           kind: 'ground',
           effect: 'A pressure hazard that blocks your path. It is a collision threat, not a collectible.',
-          example: 'The game is telling you the stress is real.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Bad Grade': {
           title: 'Bad Grade',
           kind: 'ground',
           effect: 'This obstacle is a performance failure. Collision ends the run.',
-          example: 'Avoid it just like any other block in the lane.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Broken Chair': {
           title: 'Broken Chair',
           kind: 'ground',
           effect: 'A broken office chair in the lane. It is still a valid kill trigger on contact.',
-          example: 'Do not walk into it.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Lost File': {
           title: 'Lost File',
           kind: 'ground',
           effect: 'The file is lost from your run as soon as you collide with it. It is a hazard.',
-          example: 'This is not a bonus object.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Blue Screen': {
           title: 'Blue Screen',
           kind: 'ground',
           effect: 'A digital crash hazard that blocks your path. Contact ends the run.',
-          example: 'The blue color is a warning sign, not a friendly effect.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Transit Delay': {
           title: 'Transit Delay',
           kind: 'ground',
           effect: 'A transportation delay hazard in the lane. Touching it is instant failure.',
-          example: 'It is more about timing than story.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Forgot Password': {
           title: 'Forgot Password',
           kind: 'ground',
           effect: 'A login problem that materializes as a block. It is still an obstacle.',
-          example: 'It is a hazard in the lane; avoid it.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Broken Elevator': {
           title: 'Broken Elevator',
           kind: 'ground',
           effect: 'An office logistics hazard that ends the run if you collide with it.',
-          example: 'Treat it like a solid wall in motion.'
+          example: 'Touching this obstacle ends the run.'
         },
         'Flying Money': {
           title: 'Flying Money',
           kind: 'money',
           effect: 'The money looks like a reward, but it is a trap in motion. If it reaches you, it ends the run as a collision hazard.',
-          example: 'It is visually attractive but still dangerous; never chase the shiny object.'
+          example: 'Touching this obstacle ends the run.'
         },
         coffee: {
           title: 'Coffee Pickup',
@@ -3736,7 +3817,7 @@
           title: 'Money Pickup',
           kind: 'money',
           effect: 'The floating money is an eye-catching trap; touching it ends the run even though it looks like a reward.',
-          example: 'This is the most important visual trap to understand.'
+          example: 'Touching this obstacle ends the run.'
         }
       };
 
@@ -3929,6 +4010,24 @@
         });
       }
 
+      function isAwarenessObstacleInFrame(obstacle) {
+        return Boolean(
+          obstacle?.el
+          && obstacle.el.isConnected
+          && obstacle.el.classList.contains('awareness-glow')
+          && obstacle.x + obstacle.width > 0
+        );
+      }
+
+      function getVisibleAwarenessObstacle() {
+        const markedObstacle = state.awarenessMarker?.obstacle;
+        if (isAwarenessObstacleInFrame(markedObstacle)) {
+          return markedObstacle;
+        }
+
+        return state.obstacles.find(isAwarenessObstacleInFrame) || null;
+      }
+
       function positionAwarenessButton(obstacle) {
         const x = obstacle.x + obstacle.width / 2;
         const y = obstacle.y + obstacle.height + awarenessMarkerOffset;
@@ -3957,6 +4056,10 @@
 
       function hideAwarenessMarker() {
         if (!awarenessButton) return;
+        const markedObstacle = state.awarenessMarker?.obstacle;
+        if (markedObstacle?.el) {
+          markedObstacle.el.classList.remove('awareness-glow');
+        }
         state.obstacles.forEach((obstacle) => {
           if (obstacle?.el) {
             obstacle.el.classList.remove('awareness-target');
@@ -4005,7 +4108,7 @@
         }
 
         const currentObstacle = state.awarenessMarker?.obstacle;
-        if (!currentObstacle || !currentObstacle.el || !currentObstacle.el.isConnected) {
+        if (!isAwarenessObstacleInFrame(currentObstacle)) {
           hideAwarenessMarker();
           return;
         }
@@ -4036,6 +4139,9 @@
         currentAwarenessRewardKey = labelKey;
         const alreadyLearned = isObstacleLearned(labelKey);
         const fullAtCap = stateAwarenessPoints >= awarenessPointCap;
+        const verdict = Math.random() < 0.5
+          ? entry.example
+          : 'Do not walk into it.';
 
         renderAwarenessPreview(previewObstacle);
 
@@ -4050,8 +4156,8 @@
             <p>${entry.effect}</p>
           </div>
           <div class="awareness-card">
-            <h3>Learned hazard</h3>
-            <p>${entry.example}</p>
+            <h3>Verdict</h3>
+            <p>${verdict}</p>
           </div>
         `;
 
@@ -4098,9 +4204,10 @@
 
       function openAwarenessMode(targetObstacle = null) {
         const candidate = targetObstacle
-          || state.awarenessMarker?.obstacle
-          || state.obstacles.slice().sort((a, b) => b.x - a.x)[0]
-          || { kind: 'money', label: 'Flying Money' };
+          || getVisibleAwarenessObstacle();
+        if (!isAwarenessObstacleInFrame(candidate)) {
+          return;
+        }
 
         const label = getAwarenessKeyFromObstacle(candidate);
         state.paused = true;
@@ -4439,7 +4546,6 @@
       }
 
       function resetGameState() {
-        state.startActionLockUntil = performance.now() + 250;
         if (awarenessCountdownTimer) {
           clearTimeout(awarenessCountdownTimer);
           awarenessCountdownTimer = null;
@@ -4505,10 +4611,16 @@
         state.jumpBufferRemaining = 0;
         state.fastDropJumpGraceRemaining = 0;
         state.airJumpsLeft = 1;
-        state.startActionLockUntil = performance.now() + 180;
+        state.startupInputGuard = true;
+        state.runner.y = 0;
+        state.runner.velocityY = 0;
+        runnerEl.style.transform = 'translate3d(0, 0, 0)';
+        clearRunnerJumpAnimation();
         state.started = true;
         state.paused = false;
         state.pausedForBackground = false;
+        clearActiveInputState();
+        startButton.blur();
         startVisibleLoop();
         startScreen.classList.add('hidden');
         pauseScreen.classList.add('hidden');
@@ -4581,8 +4693,10 @@
         }
       }
 
-      function jump() {
+      function jump(inputSource = null) {
+        if (inputSource !== 'keyboard' && inputSource !== 'gamepad') return;
         if (!state.started || state.paused || state.gameOver) return;
+        state.startupInputGuard = false;
 
         if (state.runner.y <= 0 && state.fastDropJumpGraceRemaining > 0 && state.airJumpsLeft > 0) {
           state.fastDropJumpGraceRemaining = 0;
@@ -4606,15 +4720,14 @@
         state.fastDropJumpGraceRemaining = 500;
       }
 
-      function handleAction() {
+      function handleAction(inputSource = null) {
+        if (inputSource !== 'keyboard' && inputSource !== 'gamepad') return;
         if (performance.now() < state.startActionLockUntil) {
           return;
         }
 
-        if (!state.started && !state.gameOver) {
-          beginGame();
-        } else if (state.started && !state.paused && !state.gameOver) {
-          jump();
+        if (state.started && !state.paused && !state.gameOver) {
+          jump(inputSource);
         }
       }
 
@@ -5240,6 +5353,12 @@
 
       function update(delta) {
 
+        if (state.startupInputGuard) {
+          state.runner.y = 0;
+          state.runner.velocityY = 0;
+          state.jumpBufferRemaining = 0;
+          clearRunnerJumpAnimation();
+        }
 
         // Advance scoring, difficulty, spawning, physics, movement, and collisions together.
         state.jumpBufferRemaining = Math.max(0, state.jumpBufferRemaining - delta);
@@ -5453,15 +5572,20 @@
         }
       }
 
+      startButton.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+      });
+
       startButton.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
         state.jumpBufferRemaining = 0;
         state.fastDropJumpGraceRemaining = 0;
-        state.startActionLockUntil = performance.now() + 180;
         playSelectSound();
         resetGameState();
-        beginGame();
+        queueMicrotask(beginGame);
       });
 
       shopButton.addEventListener('click', () => {
@@ -5493,7 +5617,6 @@
         event.stopPropagation();
         state.jumpBufferRemaining = 0;
         state.fastDropJumpGraceRemaining = 0;
-        state.startActionLockUntil = performance.now() + 180;
         playSelectSound();
         resetGameState();
         beginGame();
@@ -5508,9 +5631,46 @@
         ensureMusicEngine();
         const nextEnabled = !musicEnabled;
         setMusicEnabled(nextEnabled);
+        musicToggle.blur();
         if (nextEnabled) {
           playSelectSound();
         }
+      });
+
+      awarenessHelpToggle.addEventListener('click', () => {
+        awarenessHelpToggle.classList.remove('is-tooltip-dismissed');
+        awarenessHelpToggle.blur();
+        const currentObstacle = getVisibleAwarenessObstacle();
+        if (!isAwarenessObstacleInFrame(currentObstacle)) {
+          awarenessHelpToggle.classList.add('is-tooltip-visible');
+          if (awarenessHelpTooltipTimer) {
+            clearTimeout(awarenessHelpTooltipTimer);
+          }
+          awarenessHelpTooltipTimer = setTimeout(() => {
+            awarenessHelpToggle.classList.remove('is-tooltip-visible');
+            awarenessHelpToggle.classList.add('is-tooltip-dismissed');
+            awarenessHelpTooltipTimer = null;
+          }, 7000);
+          return;
+        }
+        playSelectSound();
+        openAwarenessMode();
+      });
+
+      document.addEventListener('pointerdown', (event) => {
+        if (awarenessHelpToggle.contains(event.target)) {
+          return;
+        }
+        awarenessHelpToggle.classList.remove('is-tooltip-visible');
+        if (awarenessHelpTooltipTimer) {
+          clearTimeout(awarenessHelpTooltipTimer);
+          awarenessHelpTooltipTimer = null;
+        }
+        awarenessHelpToggle.classList.add('is-tooltip-dismissed');
+      });
+
+      awarenessHelpToggle.addEventListener('mouseenter', () => {
+        awarenessHelpToggle.classList.remove('is-tooltip-dismissed');
       });
 
       awarenessPointsButton.addEventListener('click', () => {
@@ -5528,10 +5688,27 @@
         claimAwarenessReward();
       });
 
-      closeAwarenessButton.addEventListener('click', () => {
+      closeAwarenessButton.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+      });
+
+      closeAwarenessButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         playSelectSound();
         awarenessScreen.classList.add('hidden');
+        window.setTimeout(() => {
+          awarenessPointsButton.blur();
+          claimAwarenessButton.blur();
+          closeAwarenessButton.blur();
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+        }, 0);
         if (state.pausedForAwareness && state.started && !state.gameOver) {
+          clearActiveInputState();
           state.pausedForAwareness = false;
           state.paused = false;
           state.lastTime = performance.now();
@@ -5587,6 +5764,17 @@
         const isJumpAction = event.code === 'Space' || event.code === 'ArrowUp' || event.code === 'KeyW';
         const isDiveAction = event.code === 'KeyS' || event.code === 'ArrowDown';
 
+        if (isJumpAction) {
+          if (blockedMenuJumpKeys.has(event.code) || heldInputKeys.has(event.code) || event.repeat) {
+            event.preventDefault();
+            return;
+          }
+          heldInputKeys.add(event.code);
+          if (!state.started) {
+            blockedMenuJumpKeys.add(event.code);
+          }
+        }
+
         if (performance.now() < state.startActionLockUntil) {
           if (isJumpAction || isDiveAction || event.code === 'Escape') {
             event.preventDefault();
@@ -5614,9 +5802,16 @@
         }
 
         if (isJumpAction) {
-          if (document.activeElement && document.activeElement.closest('input, textarea, select')) return;
+          const eventUiTarget = event.target instanceof Element
+            ? event.target.closest('button, input, textarea, select, .screen, .panel')
+            : null;
+          const focusedUiTarget = document.activeElement?.closest('button, input, textarea, select, .screen, .panel');
+          if (eventUiTarget || focusedUiTarget) {
+            event.preventDefault();
+            return;
+          }
           event.preventDefault();
-          handleAction();
+          handleAction('keyboard');
         }
 
         if (isDiveAction) {
@@ -5625,6 +5820,15 @@
           event.preventDefault();
           diveDown();
         }
+      });
+
+      document.addEventListener('keyup', (event) => {
+        heldInputKeys.delete(event.code);
+        blockedMenuJumpKeys.delete(event.code);
+      });
+
+      window.addEventListener('blur', () => {
+        clearActiveInputState();
       });
 
       gameArea.addEventListener('pointerdown', (event) => {
