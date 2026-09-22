@@ -39,6 +39,7 @@
         margin: 0;
         min-height: 100%;
         height: 100%;
+        overflow-x: hidden;
       }
 
       body {
@@ -55,7 +56,7 @@
         max-height: 78vh;
         position: relative;
         border-radius: 0;
-        overflow: hidden;
+        overflow: visible;
         border: 4px solid #bbd9ee;
         background: linear-gradient(180deg, #1f2d3a 0%, #0d141b 100%);
         box-shadow:
@@ -100,10 +101,35 @@
         height: 48px;
       }
 
+      .chip-group.score-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        height: 48px;
+        min-height: 48px;
+      }
+
+      .score-group .chip {
+        width: 166px;
+      }
+
+      .score-group .score-chip {
+        order: 1;
+      }
+
+      .score-group .awareness-chip {
+        order: 2;
+        width: 52px;
+        min-width: 52px;
+        flex: 0 0 auto;
+        margin-left: 0;
+      }
+
       .player-stack {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: stretch;
         justify-content: flex-start;
         gap: 10px;
         height: 108px;
@@ -128,6 +154,12 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
+      }
+
+      .control-row .chip {
+        flex: 1 1 0;
+        min-width: 0;
       }
 
       .chip.music-toggle,
@@ -135,6 +167,7 @@
         position: relative;
         padding: 0 10px;
         min-width: 52px;
+        width: auto;
         height: 48px;
         justify-content: center;
         cursor: pointer;
@@ -218,6 +251,12 @@
         height: 100%;
       }
 
+      .score-chip {
+        width: 166px;
+        min-width: 166px;
+        justify-content: flex-start;
+      }
+
       #score-value {
         color: var(--secondary);
         transition: transform 0.15s ease, color 0.15s ease;
@@ -243,6 +282,7 @@
         position: absolute;
         inset: 0;
         overflow: hidden;
+        touch-action: manipulation;
       }
 
       .game-area.is-paused *,
@@ -498,6 +538,7 @@
         position: absolute;
         left: 80px;
         bottom: 30px;
+        will-change: transform;
         width: 54px;
         height: 68px;
         z-index: 10;
@@ -1163,6 +1204,21 @@
         bottom: 30px;
         z-index: 9;
         filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35));
+        will-change: transform;
+      }
+
+      .obstacle.awareness-target {
+        z-index: 20;
+        cursor: pointer;
+      }
+
+      .obstacle.awareness-glow .obstacle-item {
+        filter:
+          drop-shadow(0 2px 0 rgba(36, 6, 12, 0.8))
+          drop-shadow(2px 3px 0 rgba(36, 6, 12, 0.35))
+          drop-shadow(0 0 5px rgba(255, 142, 161, 0.28))
+            drop-shadow(0 0 1px var(--secondary))
+            drop-shadow(0 0 5px var(--secondary));
       }
 
       .obstacle-card {
@@ -1177,7 +1233,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 54px;
+        width: 48px;
         height: 48px;
         background: transparent;
         image-rendering: pixelated;
@@ -1262,20 +1318,25 @@
         -webkit-text-stroke: 0.6px #ffd76a;
         pointer-events: none;
         white-space: nowrap;
-        animation: scorePopupFloat 0.8s ease-out forwards;
+        will-change: transform, opacity;
+        animation: scorePopupFloat 1.25s linear forwards;
       }
 
       @keyframes scorePopupFloat {
         0% {
-          transform: translate(-50%, 0) scale(0.6);
-          opacity: 0;
-        }
-        15% {
-          transform: translate(-50%, -6px) scale(1.15);
+          transform: translate(-50%, 0) scale(1);
           opacity: 1;
         }
-        100% {
+        70% {
           transform: translate(-50%, -46px) scale(1);
+          opacity: 1;
+        }
+        80% {
+          transform: translate(-50%, -54px) scale(0.98);
+          opacity: 0;
+        }
+        100% {
+          transform: translate(-50%, -62px) scale(0.95);
           opacity: 0;
         }
       }
@@ -1306,6 +1367,7 @@
       .coffee-cup {
         position: absolute;
         bottom: 30px;
+        will-change: transform, bottom;
         width: 26px;
         height: 24px;
         border-radius: 0 0 8px 8px;
@@ -1416,6 +1478,284 @@
         border-radius: 60% 0 60% 0;
       }
 
+      .awareness-chip {
+        position: relative;
+        width: 46px;
+        min-width: 46px;
+        height: 48px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        overflow: visible;
+        appearance: none;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .awareness-chip .chip-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .awareness-icon {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        line-height: 1;
+        filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45));
+        transition: filter 0.15s ease;
+      }
+
+      .awareness-bulb {
+        position: absolute;
+        left: 50%;
+        top: 58%;
+        width: 30px;
+        height: 35px;
+        display: block;
+        overflow: visible;
+        transform: translate(-50%, -50%);
+      }
+
+      .awareness-chip .chip-value {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        z-index: 1;
+        margin: 0;
+        transform: translate(-50%, -50%);
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+        font-weight: 900;
+        letter-spacing: 0;
+        color: #4ade80;
+        text-shadow:
+          2px 0 0 #0d1722,
+          -2px 0 0 #0d1722,
+          0 2px 0 #0d1722,
+          0 -2px 0 #0d1722;
+      }
+
+      .awareness-chip:active .chip-value,
+      .awareness-chip:focus-visible .chip-value,
+      .awareness-chip.is-pressed .chip-value {
+        color: #4ade80;
+      }
+
+      .awareness-marker {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        z-index: 30;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #ffffff;
+        font-family: "Courier New", monospace;
+        font-size: 1.9rem;
+        font-weight: 900;
+        line-height: 1;
+        text-shadow:
+          -1px -1px 0 #000000,
+          1px -1px 0 #000000,
+          -1px 1px 0 #000000,
+          1px 1px 0 #000000,
+          0 0 0 #000000;
+        cursor: pointer;
+        pointer-events: auto;
+        transform: translate(-50%, -50%);
+      }
+
+      .awareness-marker.hidden {
+        display: none;
+      }
+
+      .awareness-panel {
+        width: min(72%, 360px);
+      }
+
+      .awareness-info {
+        display: grid;
+        gap: 0.7rem;
+        margin: 0.8rem 0 0.8rem;
+        text-align: left;
+      }
+
+      .awareness-preview {
+        display: grid;
+        place-items: center;
+        min-height: 82px;
+        padding: 0.75rem;
+        border: 3px solid #67e8ff;
+        background: rgba(15, 23, 42, 0.7);
+        box-shadow:
+          0 0 0 2px rgba(103, 232, 255, 0.35),
+          inset 0 0 18px rgba(103, 232, 255, 0.16);
+      }
+
+      .awareness-preview .obstacle {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        transform: none !important;
+        filter: drop-shadow(0 0 5px rgba(103, 232, 255, 0.6));
+      }
+
+      .awareness-preview .awareness-icon {
+        position: relative;
+        inset: auto;
+        width: 54px;
+        height: 58px;
+        transform: none;
+        filter: none;
+      }
+
+      .awareness-preview .awareness-bulb {
+        width: 42px;
+        height: 50px;
+      }
+
+      .awareness-preview-value {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        z-index: 2;
+        transform: translate(-50%, -50%);
+        color: #4ade80;
+        font-family: "Courier New", monospace;
+        font-size: 1.2rem;
+        font-weight: 900;
+        line-height: 1;
+        text-shadow:
+          2px 0 0 #0d1722,
+          -2px 0 0 #0d1722,
+          0 2px 0 #0d1722,
+          0 -2px 0 #0d1722;
+      }
+
+      .awareness-card {
+        background: rgba(15, 23, 42, 0.8);
+        border: 2px solid rgba(103, 232, 255, 0.7);
+        padding: 0.7rem 0.8rem;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.05);
+      }
+
+      .awareness-card h3 {
+        margin: 0 0 0.25rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #7dd3fc;
+      }
+
+      .awareness-card p {
+        margin: 0;
+        color: #dbeafe;
+        font-size: 0.7rem;
+        line-height: 1.5;
+      }
+
+      .shop-panel {
+        width: min(86%, 560px);
+      }
+
+      .shop-grid {
+        display: grid;
+        gap: 0.7rem;
+        margin-top: 0.8rem;
+        margin-bottom: 0.9rem;
+      }
+
+      .shop-category {
+        display: grid;
+        gap: 0.55rem;
+        text-align: left;
+      }
+
+      .shop-category-title {
+        margin: 0;
+        color: #fbbf24;
+        font-size: 0.62rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .shop-item-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.6rem;
+      }
+
+      .shop-item {
+        appearance: none;
+        border: 2px solid rgba(148, 163, 184, 0.85);
+        background: rgba(15, 23, 42, 0.9);
+        padding: 0.55rem 0.5rem;
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .shop-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(103, 232, 255, 0.9);
+      }
+
+      .shop-item.selected {
+        border-color: #4ade80;
+        box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+      }
+
+      .shop-item.purchased {
+        border-color: #fbbf24;
+      }
+
+      .shop-item-name {
+        font-size: 0.62rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .shop-item-cost {
+        font-size: 0.62rem;
+        color: #fbbf24;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .shop-item-cta {
+        margin-top: 0.1rem;
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #dbeafe;
+      }
+
       .screen {
         position: absolute;
         inset: 0;
@@ -1434,6 +1774,32 @@
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
+      }
+
+      .awareness-countdown {
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        color: var(--secondary);
+        font-family: "Courier New", monospace;
+        font-size: clamp(4rem, 12vw, 8rem);
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        font-variant-numeric: tabular-nums;
+        -webkit-text-stroke: 1px #0d1722;
+        text-shadow:
+          3px 0 0 #0d1722,
+          -3px 0 0 #0d1722,
+          0 3px 0 #0d1722,
+          0 -3px 0 #0d1722,
+          0 0 10px rgba(125, 249, 178, 0.5);
+        pointer-events: none;
+      }
+
+      .awareness-countdown.hidden {
+        display: none;
       }
 
       .panel {
@@ -1733,7 +2099,14 @@
         display: flex;
         gap: 0.8rem;
         justify-content: center;
+        align-items: stretch;
         flex-wrap: wrap;
+        margin-top: 0.4rem;
+      }
+
+      .awareness-panel .actions {
+        display: block;
+        width: 100%;
         margin-top: 0.4rem;
       }
 
@@ -1757,6 +2130,12 @@
         border-radius: 0;
         padding: 0.65rem 1.1rem;
         min-width: 140px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.15;
         background: #79f2b3;
         color: #0c1d1a;
         font-size: 0.75rem;
@@ -1774,26 +2153,81 @@
       }
 
       .action-btn.secondary {
-        background: #7ec8ff;
-        color: #0a1d2f;
+        background: #67e8ff;
+        color: #08212b;
+      }
+
+      #shop-button {
+        background: #46d9ff;
+        color: #08212b;
+      }
+
+      .awareness-panel .action-btn {
+        display: flex;
+        width: 100%;
+        max-width: none;
+        min-width: 0;
       }
 
       .final-score {
-        margin: 0.3rem 0;
-        color: #ffffff;
-        font-size: 0.95rem;
-        letter-spacing: 0.08em;
+        margin: 0;
+        color: #cbd5e1;
+        font-size: 0.58rem;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        line-height: 1.25;
         text-transform: uppercase;
       }
 
       .final-score strong {
+        display: block;
+        margin-top: 3px;
         color: #facc15;
+        font-size: 1.25rem;
+        letter-spacing: 0.04em;
+      }
+
+      .game-over-stats {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: center;
+        gap: 8px;
+        margin: 0.55rem 0 0.35rem;
+        padding: 8px;
+        border: 2px solid rgba(125, 211, 252, 0.45);
+        background: rgba(15, 23, 42, 0.72);
+      }
+
+      .game-over-stats .final-score + .final-score {
+        border-left: 0;
+        transform: translateX(3px);
+      }
+
+      .game-over-stats .final-score {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        text-align: center;
+      }
+
+      .game-over-stats::before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 50%;
+        width: 2px;
+        background: rgba(125, 211, 252, 0.3);
+        transform: translateX(-50%);
       }
 
       .personal-best-feedback {
         min-height: 1.1em;
-        margin: 0.2rem 0 0.45rem;
-        color: #cbd5e1;
+        margin: 0.15rem 0 0.45rem;
+        color: #fb923c;
         font-size: 0.68rem;
         font-weight: 800;
         letter-spacing: 0.1em;
@@ -1801,8 +2235,8 @@
       }
 
       .personal-best-feedback.new-best {
-        color: #86efac;
-        text-shadow: 0 0 8px rgba(134, 239, 172, 0.55);
+        color: #fbbf24;
+        text-shadow: 0 0 8px rgba(251, 191, 36, 0.55);
       }
 
       .character-preview {
@@ -1947,18 +2381,33 @@
         </div>
 
         <div class="hud-row">
-          <div class="chip-group">
-            <div class="chip">
+          <div class="chip-group score-group">
+            <div class="chip score-chip">
               <span class="chip-label">Score</span>
               <span class="chip-value" id="score-value">0</span>
             </div>
+            <button class="chip awareness-chip" id="awareness-points-button" type="button" aria-label="Show Awareness Points information">
+              <span class="chip-label">Awareness</span>
+              <span class="awareness-icon" id="awareness-bulb-icon" aria-hidden="true">
+                <svg class="awareness-bulb" viewBox="0 0 32 38">
+                  <defs>
+                    <clipPath id="awareness-bulb-clip">
+                      <path d="M16 2C9.9 2 5 6.7 5 12.6c0 3.8 1.8 6.7 4.4 8.8 1.2 1 1.8 2.1 1.8 3.6V27h9.6v-2c0-1.5.6-2.6 1.8-3.6 2.6-2.1 4.4-5 4.4-8.8C27 6.7 22.1 2 16 2Z"/>
+                    </clipPath>
+                  </defs>
+                  <path id="awareness-bulb-shell" d="M16 2C9.9 2 5 6.7 5 12.6c0 3.8 1.8 6.7 4.4 8.8 1.2 1 1.8 2.1 1.8 3.6V27h9.6v-2c0-1.5.6-2.6 1.8-3.6 2.6-2.1 4.4-5 4.4-8.8C27 6.7 22.1 2 16 2Z" fill="#ffffff" stroke="#1c2b3d" stroke-width="2" stroke-linejoin="round" />
+                  <g clip-path="url(#awareness-bulb-clip)">
+                    <rect id="awareness-bulb-fill" x="5" y="28" width="22" height="0" fill="#ffffff" opacity="0.95"/>
+                  </g>
+                  <path d="M11 30h10M12.5 34h7" stroke="#1c2b3d" stroke-width="3" stroke-linecap="square" />
+                  <path d="M16 0v-3M4 5 2 3M28 5l2-2M2 14h-3M30 14h3" stroke="currentColor" stroke-width="2" stroke-linecap="square" />
+                </svg>
+              </span>
+              <span class="chip-value" id="awareness-points-value">0</span>
+            </button>
           </div>
           <div class="chip-group player-group">
             <div class="player-stack">
-              <div class="chip">
-                <span class="chip-label">Player</span>
-                <span class="chip-value" id="player-display">Guest</span>
-              </div>
               <div class="control-row">
                 <button class="chip pause-toggle" id="pause-toggle" type="button" aria-label="Pause game" aria-pressed="false">
                   <span aria-hidden="true"></span>
@@ -1973,6 +2422,9 @@
       </div>
 
       <div class="game-area" id="game-area" aria-label="Office Rush game area">
+        <button class="awareness-marker hidden" id="awareness-toggle" type="button" aria-label="Learn obstacle">?</button>
+        <div class="awareness-countdown hidden" id="awareness-countdown" aria-live="assertive"></div>
+
         <div class="office-bg">
           <!-- Minimal office atmosphere: ceiling lights only -->
 
@@ -2095,6 +2547,33 @@
           <div class="actions start-actions">
             <button id="start-button" class="action-btn" type="button">Start Run</button>
             <button id="how-to-play-button" class="action-btn secondary" type="button">How to Play</button>
+            <button id="shop-button" class="action-btn secondary" type="button">Shop</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Awareness Screen -->
+      <div class="screen hidden" id="awareness-screen">
+        <div class="panel awareness-panel">
+          <h1>Awareness Points</h1>
+          <p class="tagline">Learn hazards and earn points</p>
+          <div class="awareness-preview" id="awareness-preview" aria-label="Highlighted obstacle preview"></div>
+          <div class="awareness-info" id="awareness-info"></div>
+          <div class="actions">
+            <button id="claim-awareness-button" class="action-btn" type="button" style="display: none;">I get it!</button>
+            <button id="close-awareness-button" class="action-btn secondary" type="button">Back to Game</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shop Screen -->
+      <div class="screen hidden" id="shop-screen">
+        <div class="panel shop-panel">
+          <h1>Awareness Shop</h1>
+          <p class="tagline">Spend awareness points</p>
+          <div class="shop-grid" id="shop-grid"></div>
+          <div class="actions">
+            <button id="close-shop-button" class="action-btn" type="button">Back</button>
           </div>
         </div>
       </div>
@@ -2104,7 +2583,7 @@
         <div class="panel how-to-play-panel">
           <h1>How to Play</h1>
           <div class="how-to-play-list">
-            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8593;</span><span class="how-to-play-copy"><strong>Jump:</strong> Press W, Up Arrow, Space, or Left Click.</span></div>
+            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8593;</span><span class="how-to-play-copy"><strong>Jump:</strong> Press W, Up Arrow, or Space.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8593;&#8593;</span><span class="how-to-play-copy"><strong>Double Jump:</strong> Press the jump control again while in the air.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8595;</span><span class="how-to-play-copy"><strong>Fast Drop:</strong> Hold S or Down Arrow to move down quickly.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">!</span><span class="how-to-play-copy"><strong>Hazards:</strong> Red objects are dangerous. Avoid them.</span></div>
@@ -2134,7 +2613,10 @@
       <div class="screen hidden" id="game-over-screen">
         <div class="panel">
           <h1>Game Over</h1>
-          <p class="final-score">Score: <strong id="final-score">0</strong></p>
+          <div class="game-over-stats">
+            <p class="final-score">Score<strong id="final-score">0</strong></p>
+            <p class="final-score">Obstacles avoided<strong id="obstacles-avoided">0</strong></p>
+          </div>
           <p class="personal-best-feedback" id="personal-best-feedback" aria-live="polite"></p>
           
           <div class="leaderboard">
@@ -2187,6 +2669,7 @@
       const pauseScreen = document.getElementById('pause-screen');
       const gameOverScreen = document.getElementById('game-over-screen');
       const finalScore = document.getElementById('final-score');
+      const obstaclesAvoided = document.getElementById('obstacles-avoided');
       const personalBestFeedback = document.getElementById('personal-best-feedback');
       const menuPersonalBestValue = document.getElementById('menu-personal-best-value');
       const startButton = document.getElementById('start-button');
@@ -2197,6 +2680,19 @@
       const resumeButton = document.getElementById('resume-button');
       const quitToMenuButton = document.getElementById('quit-to-menu-button');
       const usernameInput = document.getElementById('username-input');
+      const awarenessPointsValue = document.getElementById('awareness-points-value');
+      const awarenessPointsButton = document.getElementById('awareness-points-button');
+      const awarenessButton = document.getElementById('awareness-toggle');
+      const awarenessScreen = document.getElementById('awareness-screen');
+      const awarenessInfo = document.getElementById('awareness-info');
+      const awarenessPreview = document.getElementById('awareness-preview');
+      const awarenessCountdown = document.getElementById('awareness-countdown');
+      const claimAwarenessButton = document.getElementById('claim-awareness-button');
+      const closeAwarenessButton = document.getElementById('close-awareness-button');
+      const shopButton = document.getElementById('shop-button');
+      const shopScreen = document.getElementById('shop-screen');
+      const shopGrid = document.getElementById('shop-grid');
+      const closeShopButton = document.getElementById('close-shop-button');
       const leaderboardList = document.getElementById('leaderboard-list');
 
       let musicEnabled = true;
@@ -2205,6 +2701,8 @@
       let activeMusicMode = null;
       const MAX_MUSIC_GAIN = 0.16;
       let animationFrameId = null;
+      let obstacleCountAnimationId = null;
+      let awarenessCountdownTimer = null;
       const rememberedUsernameKey = 'officeRushUsername';
       const personalBestKeyPrefix = 'officeRushPersonalBest:';
 
@@ -2264,6 +2762,33 @@
         }
       }
 
+      function playAwarenessCountdownSound(secondsRemaining) {
+        try {
+          if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          const frequency = secondsRemaining === 1 ? 660 : secondsRemaining === 2 ? 494 : 370;
+
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(frequency, now);
+          gainNode.gain.setValueAtTime(0.06, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        } catch (error) {
+          console.error('Countdown audio error:', error);
+        }
+      }
+
       const FIXED_CEILING_LIGHT_COLOR = '#9be9ff';
 
       let selectedHairStyle = 'bald';
@@ -2273,6 +2798,7 @@
       let selectedCeilingHue = 190;
       let displayedScore = null;
       let displayedUsername = null;
+      let currentAwarenessRewardKey = null;
 
       function hslToHex(h, s, l) {
         s /= 100;
@@ -2455,7 +2981,8 @@
         'Parking Ticket' , 'Traffic Jam' , 'Late Meeting' , 'Laptop Dead' , 
         'Unstable Wi-Fi' , 'Unpaid Overtime' , 'Cold Lunch' , 'Clogged Toilet' , 
         'CAPTCHAs' , 'Low Battery' , 'Spam Call' , 'Paper Cut' , 'Deadlines' , 
-        'Bad Grade' , 'Broken Chair' , 'Lost File' , 'Blue Screen' , 'Transit Delay'
+        'Bad Grade' , 'Broken Chair' , 'Lost File' , 'Blue Screen' , 'Transit Delay' ,
+        'Forgot Password' , 'Broken Elevator' , 'Lost Wallet'
       ];
 
       // Central game state shared by physics, spawning, scoring, and screens.
@@ -2471,13 +2998,17 @@
         spawnTimer: 0,
         coffeeTimer: 0,
         lastPickupType: 'coffee',
+        pausedForAwareness: false,
         obstacleSpeed: 440,
         targetDifficultyLevel: 0,
         difficultyDelayRemaining: 0,
         gravity: 1900,
         jumpVelocity: 770,
         airJumpsLeft: 1,
+        jumpBufferRemaining: 0,
+        fastDropJumpGraceRemaining: 0,
         scoreSubmitted: false,
+        obstaclesAvoided: 0,
         runner: {
           x: 80,
           y: 0,
@@ -2487,7 +3018,11 @@
         },
         obstacles: [],
         coffeeCups: [],
-        groundHeight: 30
+        groundHeight: 30,
+        awarenessMarker: null,
+        awarenessMarkerCooldown: 0,
+        nextAwarenessScoreTarget: Math.round(1000 + Math.random() * 1000),
+        startActionLockUntil: 0
       };
       
       function playJumpSound() {
@@ -2844,9 +3379,9 @@
           displayedScore = currentIntScore;
         }
         if (state.username !== displayedUsername) {
-          playerDisplay.textContent = state.username;
           displayedUsername = state.username;
         }
+        updateAwarenessHud();
 
         const currentMilestone = Math.floor(currentIntScore / 1000) * 1000;
         if (currentMilestone > 0 && currentMilestone > state.lastMilestone) {
@@ -2860,6 +3395,40 @@
         scoreValue.classList.remove('score-milestone-blink');
         void scoreValue.offsetWidth;
         scoreValue.classList.add('score-milestone-blink');
+      }
+
+      function animateGameOverTotals(targetScore, targetCount) {
+        if (obstacleCountAnimationId !== null) {
+          cancelAnimationFrame(obstacleCountAnimationId);
+          obstacleCountAnimationId = null;
+        }
+
+        const startTime = performance.now();
+        const duration = 750;
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion || (targetScore <= 0 && targetCount <= 0)) {
+          finalScore.textContent = String(targetScore);
+          obstaclesAvoided.textContent = String(targetCount);
+          return;
+        }
+
+        const updateTotals = (timestamp) => {
+          const progress = Math.min(1, (timestamp - startTime) / duration);
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          finalScore.textContent = String(Math.floor(targetScore * easedProgress));
+          obstaclesAvoided.textContent = String(Math.floor(targetCount * easedProgress));
+
+          if (progress < 1) {
+            obstacleCountAnimationId = requestAnimationFrame(updateTotals);
+          } else {
+            obstacleCountAnimationId = null;
+          }
+        };
+
+        finalScore.textContent = '0';
+        obstaclesAvoided.textContent = '0';
+        obstacleCountAnimationId = requestAnimationFrame(updateTotals);
       }
 
       function applyCustomization() {
@@ -2967,6 +3536,779 @@
 
       function updateMenuPersonalBest() {
         menuPersonalBestValue.textContent = String(getPersonalBest());
+      }
+
+      const awarenessPointsKey = 'officeRushAwarenessPoints';
+      const awarenessLearnedKey = 'officeRushAwarenessLearned';
+      const shopInventoryKey = 'officeRushShopInventory';
+      const shopSelectionKey = 'officeRushShopSelection';
+      const awarenessMarkerOffset = 12;
+      const awarenessPointCap = 5;
+
+      const awarenessCatalog = {
+        'Flying Stapler': {
+          title: 'Flying Stapler',
+          kind: 'airborne',
+          effect: 'It flies across the room like a fast office hazard. If you touch it, the run ends instantly.',
+          example: 'This is the main airborne threat: fast, narrow, and easy to miss until it is too late.'
+        },
+        'Bills Due': {
+          title: 'Bills Due',
+          kind: 'ground',
+          effect: 'A ground obstacle that behaves like a sudden finance trap: contact ends the run and your score is lost.',
+          example: 'Look at the label and avoid the blocked lane before it reaches you.'
+        },
+        'Urgent Email': {
+          title: 'Urgent Email',
+          kind: 'ground',
+          effect: 'A notification hazard that looks harmless but still hits your run on contact.',
+          example: 'It is a text-based warning sign at floor level; jump or clear the lane in time.'
+        },
+        'Printer Jam': {
+          title: 'Printer Jam',
+          kind: 'ground',
+          effect: 'This is a loud office failure on the ground. It blocks your path and ends contact on impact.',
+          example: 'Treat it like any floor trap: avoid or misjudge it and you will fail.'
+        },
+        'Card Declined': {
+          title: 'Card Declined',
+          kind: 'ground',
+          effect: 'This is a stress hazard that appears in the lane. It is not a reward object; it is a collision risk.',
+          example: 'The red object is a warning, not a collectible.'
+        },
+        'Gas Prices': {
+          title: 'Gas Prices',
+          kind: 'ground',
+          effect: 'This ground obstacle represents rising cost pressure. Contact ends the run.',
+          example: 'If you are unsure, think of it as a dangerous block that must be avoided.'
+        },
+        'Out of Coffee': {
+          title: 'Out of Coffee',
+          kind: 'ground',
+          effect: 'A coffee-related hazard that looks like a visual challenge but still counts as a deadly obstacle.',
+          example: 'Do not confuse the icon with a pickup. It is a danger marker.'
+        },
+        'Keyboard Spill': {
+          title: 'Keyboard Spill',
+          kind: 'ground',
+          effect: 'A messy floor trap: the lane becomes dangerous and any collision removes the run.',
+          example: 'This hazard needs the same respect as any blocked obstacle on the ground.'
+        },
+        'Missed Alarm': {
+          title: 'Missed Alarm',
+          kind: 'ground',
+          effect: 'A time-pressure alarm that appears as a wall-like obstacle. Touching it ends the run.',
+          example: 'The symbol is a warning, not a power-up.'
+        },
+        'Parking Ticket': {
+          title: 'Parking Ticket',
+          kind: 'ground',
+          effect: 'A ground blocker representing a ticket penalty. It is a collision danger.',
+          example: 'Keep your lane clear; this item is not safe to touch.'
+        },
+        'Traffic Jam': {
+          title: 'Traffic Jam',
+          kind: 'ground',
+          effect: 'A dense obstruction that blocks the path. The correct response is dodging or jumping clear.',
+          example: 'Even if it reads like a story prompt, it still kills on impact.'
+        },
+        'Late Meeting': {
+          title: 'Late Meeting',
+          kind: 'ground',
+          effect: 'A meeting reminder shaped like a hazard. It is safe only when you avoid it.',
+          example: 'This is a collision trap disguised as office panic.'
+        },
+        'Laptop Dead': {
+          title: 'Laptop Dead',
+          kind: 'ground',
+          effect: 'A broken laptop hazard on the floor. Touching it ends the run immediately.',
+          example: 'Treat red floor objects as lethal even if they sound like office drama.'
+        },
+        'Unstable Wi-Fi': {
+          title: 'Unstable Wi-Fi',
+          kind: 'ground',
+          effect: 'A signal issue hazard that sits in the running lane and ends the run on impact.',
+          example: 'If it is red and labeled, it is a danger object.'
+        },
+        'Unpaid Overtime': {
+          title: 'Unpaid Overtime',
+          kind: 'ground',
+          effect: 'A work stress obstacle built like a wall. Collision ends the run.',
+          example: 'Do not mistake the theme for a bonus.'
+        },
+        'Cold Lunch': {
+          title: 'Cold Lunch',
+          kind: 'ground',
+          effect: 'A floor obstacle disguised as a lunch reminder. It still hurts on contact.',
+          example: 'Distraction does not make it safe.'
+        },
+        'Clogged Toilet': {
+          title: 'Clogged Toilet',
+          kind: 'ground',
+          effect: 'A messy and extreme floor hazard. It will end your run if you hit it.',
+          example: 'The label is a joke, but the collision is real.'
+        },
+        'CAPTCHAs': {
+          title: 'CAPTCHAs',
+          kind: 'ground',
+          effect: 'A digital annoyance hazard on the ground. It is a delay trap and a collision risk.',
+          example: 'Do not try to "solve" it in the lane; avoid it instead.'
+        },
+        'Low Battery': {
+          title: 'Low Battery',
+          kind: 'ground',
+          effect: 'A warning object that still counts as a collision hazard at floor level.',
+          example: 'It is not helpful; it is a threat.'
+        },
+        'Spam Call': {
+          title: 'Spam Call',
+          kind: 'ground',
+          effect: 'An office distraction turned deadly. If you touch it, the run ends.',
+          example: 'This hazard is loud in theme but lethal in gameplay.'
+        },
+        'Paper Cut': {
+          title: 'Paper Cut',
+          kind: 'ground',
+          effect: 'A small but real obstacle: contact ends the run even if the idea feels harmless.',
+          example: 'Do not judge it by the theme; judge it by the red danger status.'
+        },
+        'Deadlines': {
+          title: 'Deadlines',
+          kind: 'ground',
+          effect: 'A pressure hazard that blocks your path. It is a collision threat, not a collectible.',
+          example: 'The game is telling you the stress is real.'
+        },
+        'Bad Grade': {
+          title: 'Bad Grade',
+          kind: 'ground',
+          effect: 'This obstacle is a performance failure. Collision ends the run.',
+          example: 'Avoid it just like any other block in the lane.'
+        },
+        'Broken Chair': {
+          title: 'Broken Chair',
+          kind: 'ground',
+          effect: 'A broken office chair in the lane. It is still a valid kill trigger on contact.',
+          example: 'Do not walk into it.'
+        },
+        'Lost File': {
+          title: 'Lost File',
+          kind: 'ground',
+          effect: 'The file is lost from your run as soon as you collide with it. It is a hazard.',
+          example: 'This is not a bonus object.'
+        },
+        'Blue Screen': {
+          title: 'Blue Screen',
+          kind: 'ground',
+          effect: 'A digital crash hazard that blocks your path. Contact ends the run.',
+          example: 'The blue color is a warning sign, not a friendly effect.'
+        },
+        'Transit Delay': {
+          title: 'Transit Delay',
+          kind: 'ground',
+          effect: 'A transportation delay hazard in the lane. Touching it is instant failure.',
+          example: 'It is more about timing than story.'
+        },
+        'Forgot Password': {
+          title: 'Forgot Password',
+          kind: 'ground',
+          effect: 'A login problem that materializes as a block. It is still an obstacle.',
+          example: 'It is a hazard in the lane; avoid it.'
+        },
+        'Broken Elevator': {
+          title: 'Broken Elevator',
+          kind: 'ground',
+          effect: 'An office logistics hazard that ends the run if you collide with it.',
+          example: 'Treat it like a solid wall in motion.'
+        },
+        'Flying Money': {
+          title: 'Flying Money',
+          kind: 'money',
+          effect: 'The money looks like a reward, but it is a trap in motion. If it reaches you, it ends the run as a collision hazard.',
+          example: 'It is visually attractive but still dangerous; never chase the shiny object.'
+        },
+        coffee: {
+          title: 'Coffee Pickup',
+          kind: 'pickup',
+          effect: 'This is safe and useful: collecting it awards 100 points and keeps the run moving.',
+          example: 'A coffee pickup is a source of score, not danger.'
+        },
+        money: {
+          title: 'Money Pickup',
+          kind: 'money',
+          effect: 'The floating money is an eye-catching trap; touching it ends the run even though it looks like a reward.',
+          example: 'This is the most important visual trap to understand.'
+        }
+      };
+
+      const shopCatalog = [
+        {
+          id: 'outfit-executive',
+          category: 'Outfits',
+          name: 'Executive',
+          cost: 3,
+          type: 'outfit'
+        },
+        {
+          id: 'outfit-emerald',
+          category: 'Outfits',
+          name: 'Emerald',
+          cost: 4,
+          type: 'outfit'
+        },
+        {
+          id: 'theme-sunset',
+          category: 'Office Themes',
+          name: 'Sunset Office',
+          cost: 3,
+          type: 'theme'
+        },
+        {
+          id: 'theme-midnight',
+          category: 'Office Themes',
+          name: 'Midnight Office',
+          cost: 5,
+          type: 'theme'
+        },
+        {
+          id: 'cup-neon',
+          category: 'Coffee Cups',
+          name: 'Neon Glow',
+          cost: 3,
+          type: 'cup'
+        },
+        {
+          id: 'cup-luxe',
+          category: 'Coffee Cups',
+          name: 'Luxe Ceramic',
+          cost: 4,
+          type: 'cup'
+        }
+      ];
+
+      const defaultOwnedShopItems = ['outfit-executive'];
+      const defaultSelectedShopItems = {
+        outfit: 'outfit-executive',
+        theme: 'theme-sunset',
+        cup: 'cup-neon'
+      };
+
+      function getShopInventory() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(shopInventoryKey) || '[]');
+          return Array.isArray(stored) ? stored : defaultOwnedShopItems.slice();
+        } catch (error) {
+          return defaultOwnedShopItems.slice();
+        }
+      }
+
+      function saveShopInventory(items) {
+        try {
+          localStorage.setItem(shopInventoryKey, JSON.stringify(items));
+        } catch (error) {
+          console.warn('Unable to save shop inventory:', error);
+        }
+      }
+
+      function getShopSelections() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(shopSelectionKey) || '{}');
+          return {
+            outfit: stored.outfit || defaultSelectedShopItems.outfit,
+            theme: stored.theme || defaultSelectedShopItems.theme,
+            cup: stored.cup || defaultSelectedShopItems.cup
+          };
+        } catch (error) {
+          return { ...defaultSelectedShopItems };
+        }
+      }
+
+      function saveShopSelections(selections) {
+        try {
+          localStorage.setItem(shopSelectionKey, JSON.stringify(selections));
+        } catch (error) {
+          console.warn('Unable to save shop selections:', error);
+        }
+      }
+
+      const storedAwarenessPoints = Number(localStorage.getItem(awarenessPointsKey) || 0);
+      let stateAwarenessPoints = Number.isFinite(storedAwarenessPoints)
+        ? Math.min(awarenessPointCap, Math.max(0, storedAwarenessPoints))
+        : 0;
+      let stateAwarenessLearned = {};
+      try {
+        const rawLearned = JSON.parse(localStorage.getItem(awarenessLearnedKey) || '{}');
+        stateAwarenessLearned = rawLearned && typeof rawLearned === 'object' ? rawLearned : {};
+      } catch (error) {
+        stateAwarenessLearned = {};
+      }
+
+      function updateAwarenessHud() {
+        if (awarenessPointsValue) {
+          awarenessPointsValue.textContent = String(stateAwarenessPoints);
+        }
+
+        const awarenessBulbIcon = document.getElementById('awareness-bulb-icon');
+        const bulbShell = document.getElementById('awareness-bulb-shell');
+        const bulbFill = document.getElementById('awareness-bulb-fill');
+        const level = Math.max(0, Math.min(5, Number(stateAwarenessPoints) || 0));
+        const hasCharge = level > 0;
+        const defaultBulbColor = '#ffffff';
+        const fillHeights = [0, 8, 14, 18, 22, 26];
+        const height = hasCharge ? fillHeights[level] : 0;
+        const y = hasCharge ? String(28 - height) : '28';
+
+        if (awarenessBulbIcon) {
+          awarenessBulbIcon.style.color = defaultBulbColor;
+          awarenessBulbIcon.style.setProperty('--bulb-color', defaultBulbColor);
+          awarenessBulbIcon.setAttribute('data-full', String(level >= 5));
+          awarenessBulbIcon.style.filter = 'drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45))';
+        }
+
+        if (bulbShell) {
+          bulbShell.setAttribute('fill', '#ffffff');
+          bulbShell.setAttribute('stroke', '#1c2b3d');
+        }
+
+        if (bulbFill) {
+          bulbFill.setAttribute('y', y);
+          bulbFill.setAttribute('height', String(height));
+          bulbFill.setAttribute('fill', '#ffffff');
+          bulbFill.setAttribute('opacity', hasCharge ? '0.95' : '0.82');
+        }
+      }
+
+      function syncAwarenessStorage() {
+        try {
+          localStorage.setItem(awarenessPointsKey, String(stateAwarenessPoints));
+          localStorage.setItem(awarenessLearnedKey, JSON.stringify(stateAwarenessLearned));
+        } catch (error) {
+          console.warn('Unable to save awareness progress:', error);
+        }
+        updateAwarenessHud();
+      }
+
+      syncAwarenessStorage();
+
+      function addAwarenessPoints(amount = 1) {
+        stateAwarenessPoints = Math.min(awarenessPointCap, stateAwarenessPoints + amount);
+        syncAwarenessStorage();
+      }
+
+      function isObstacleLearned(labelKey) {
+        return Boolean(stateAwarenessLearned[labelKey]);
+      }
+
+      function markObstacleLearned(labelKey) {
+        stateAwarenessLearned[labelKey] = true;
+        syncAwarenessStorage();
+      }
+
+      function getAwarenessKeyFromObstacle(obstacle) {
+        if (!obstacle) return 'Flying Money';
+        if (obstacle.kind === 'money') return 'Flying Money';
+        if (obstacle.kind === 'coffee') return 'coffee';
+        if (obstacle.label) return obstacle.label;
+        return 'Bills Due';
+      }
+
+      function getAwarenessEntry(label) {
+        if (!label) return awarenessCatalog['Flying Money'];
+        const dangerousLabel = awarenessCatalog[label];
+        if (dangerousLabel) return dangerousLabel;
+        const typeKey = getObstacleType(label);
+        if (awarenessCatalog[typeKey]) return awarenessCatalog[typeKey];
+        return awarenessCatalog['Flying Money'];
+      }
+
+      function getActiveAwarenessObstacles() {
+        return (state.obstacles || []).filter((obstacle) => {
+          if (!obstacle || !obstacle.el || !obstacle.el.isConnected) {
+            return false;
+          }
+          return !obstacle.passed && obstacle.x >= gameArea.clientWidth - obstacle.width;
+        });
+      }
+
+      function positionAwarenessButton(obstacle) {
+        const x = obstacle.x + obstacle.width / 2;
+        const y = obstacle.y + obstacle.height + awarenessMarkerOffset;
+
+        if (awarenessButton) {
+          awarenessButton.style.left = `${x}px`;
+          awarenessButton.style.bottom = `${30 + y}px`;
+        }
+      }
+
+      function syncAwarenessTargetState(activeObstacle = state.awarenessMarker?.obstacle) {
+        if (!activeObstacle || !activeObstacle.el) {
+          return;
+        }
+
+        state.obstacles.forEach((obstacle) => {
+          if (obstacle?.el) {
+            obstacle.el.classList.toggle('awareness-target', obstacle === activeObstacle);
+          }
+        });
+
+        if (awarenessButton) {
+          awarenessButton.classList.remove('hidden');
+        }
+      }
+
+      function hideAwarenessMarker() {
+        if (!awarenessButton) return;
+        state.obstacles.forEach((obstacle) => {
+          if (obstacle?.el) {
+            obstacle.el.classList.remove('awareness-target');
+          }
+        });
+        awarenessButton.classList.add('hidden');
+        awarenessButton.style.left = '';
+        awarenessButton.style.bottom = '';
+        state.awarenessMarker = null;
+      }
+
+      function attachAwarenessMarker(obstacle) {
+        if (!awarenessButton || !obstacle) return;
+        state.awarenessMarker = { obstacle };
+        obstacle.el.classList.add('awareness-glow');
+        syncAwarenessTargetState(obstacle);
+        positionAwarenessButton(obstacle);
+        awarenessButton.setAttribute('aria-label', `Learn about ${obstacle.label || 'this obstacle'}`);
+      }
+
+      function triggerNextAwarenessTarget() {
+        const activeObstacles = getActiveAwarenessObstacles();
+        if (activeObstacles.length === 0) {
+          return;
+        }
+
+        const nextObstacle = activeObstacles
+          .slice()
+          .sort((a, b) => b.x - a.x)[0];
+
+        if (!nextObstacle) {
+          return;
+        }
+
+        attachAwarenessMarker(nextObstacle);
+        state.nextAwarenessScoreTarget = Math.round(state.score + 1000 + Math.random() * 1000);
+      }
+
+      function spawnAwarenessMarker(obstacle) {
+        attachAwarenessMarker(obstacle);
+      }
+
+      function updateAwarenessMarker() {
+        if (!state.started || state.gameOver) {
+          return;
+        }
+
+        const currentObstacle = state.awarenessMarker?.obstacle;
+        if (!currentObstacle || !currentObstacle.el || !currentObstacle.el.isConnected) {
+          hideAwarenessMarker();
+          return;
+        }
+
+        syncAwarenessTargetState(currentObstacle);
+        positionAwarenessButton(currentObstacle);
+        awarenessButton.classList.remove('hidden');
+        awarenessButton.setAttribute('aria-label', `Learn about ${currentObstacle.label || 'this obstacle'}`);
+      }
+
+      function renderAwarenessPreview(previewObstacle = null) {
+        awarenessPreview.innerHTML = '';
+        if (!previewObstacle?.el) {
+          return;
+        }
+
+        const previewElement = previewObstacle.el.cloneNode(true);
+        previewElement.classList.add('awareness-preview-obstacle');
+        previewElement.style.transform = 'none';
+        previewElement.style.left = '';
+        previewElement.style.bottom = '';
+        awarenessPreview.appendChild(previewElement);
+      }
+
+      function showAwarenessInfo(entryKey, isFromGame = false, previewObstacle = null) {
+        const entry = getAwarenessEntry(entryKey);
+        const labelKey = entry.title || entryKey;
+        currentAwarenessRewardKey = labelKey;
+        const alreadyLearned = isObstacleLearned(labelKey);
+        const fullAtCap = stateAwarenessPoints >= awarenessPointCap;
+
+        renderAwarenessPreview(previewObstacle);
+
+        claimAwarenessButton.textContent = alreadyLearned ? 'Already learned' : (fullAtCap ? 'Cap reached' : 'Claim +1 AP');
+        claimAwarenessButton.disabled = alreadyLearned || fullAtCap;
+        claimAwarenessButton.style.opacity = alreadyLearned || fullAtCap ? '0.7' : '1';
+        claimAwarenessButton.style.display = 'inline-flex';
+
+        awarenessInfo.innerHTML = `
+          <div class="awareness-card">
+            <h3>${entry.title}</h3>
+            <p>${entry.effect}</p>
+          </div>
+          <div class="awareness-card">
+            <h3>Learned hazard</h3>
+            <p>${entry.example}</p>
+          </div>
+        `;
+
+        awarenessScreen.classList.remove('hidden');
+        if (isFromGame && !state.started) {
+          state.started = false;
+        }
+      }
+
+      function openAwarenessPointsInfo() {
+        awarenessPreview.innerHTML = '';
+        const bulbPreview = document.querySelector('.awareness-icon')?.cloneNode(true);
+        if (bulbPreview) {
+          bulbPreview.setAttribute('aria-hidden', 'true');
+          awarenessPreview.appendChild(bulbPreview);
+          const previewValue = document.createElement('span');
+          previewValue.className = 'awareness-preview-value';
+          previewValue.textContent = String(stateAwarenessPoints);
+          previewValue.setAttribute('aria-label', `${stateAwarenessPoints} Awareness Points`);
+          bulbPreview.appendChild(previewValue);
+        }
+        awarenessInfo.innerHTML = `
+          <div class="awareness-card">
+            <h3>Awareness Points</h3>
+            <p>Learn about marked obstacles to earn Awareness Points. Spend them in the shop on outfits, office themes, and coffee cup styles.</p>
+          </div>
+          <div class="awareness-card">
+            <h3>Your Balance</h3>
+            <p>You have <strong>${stateAwarenessPoints}</strong> of ${awarenessPointCap} Awareness Points.</p>
+          </div>
+        `;
+        claimAwarenessButton.textContent = `Points: ${stateAwarenessPoints}/${awarenessPointCap}`;
+        claimAwarenessButton.disabled = true;
+        claimAwarenessButton.style.opacity = '0.7';
+        claimAwarenessButton.style.display = 'none';
+        if (state.started && !state.paused && !state.gameOver) {
+          state.paused = true;
+          state.pausedForAwareness = true;
+          syncRunnerAnimationState();
+          stopArcadeMusic();
+        }
+        awarenessScreen.classList.remove('hidden');
+      }
+
+      function openAwarenessMode(targetObstacle = null) {
+        const candidate = targetObstacle
+          || state.awarenessMarker?.obstacle
+          || state.obstacles.slice().sort((a, b) => b.x - a.x)[0]
+          || { kind: 'money', label: 'Flying Money' };
+
+        const label = getAwarenessKeyFromObstacle(candidate);
+        state.paused = true;
+        state.pausedForAwareness = true;
+        syncRunnerAnimationState();
+        stopArcadeMusic();
+        showAwarenessInfo(label, true, candidate);
+      }
+
+      function claimAwarenessReward() {
+        const rewardKey = currentAwarenessRewardKey || 'Flying Money';
+        const entry = getAwarenessEntry(rewardKey);
+
+        if (stateAwarenessPoints >= awarenessPointCap) {
+          awarenessInfo.innerHTML = `
+            <div class="awareness-card">
+              <h3>${entry.title}</h3>
+              <p>${entry.effect}</p>
+            </div>
+            <div class="awareness-card">
+              <h3>Awareness cap reached</h3>
+              <p>You are at ${stateAwarenessPoints}/${awarenessPointCap} awareness points. Spend them in the shop before earning another one.</p>
+            </div>
+          `;
+          claimAwarenessButton.textContent = 'Cap reached';
+          claimAwarenessButton.disabled = true;
+          claimAwarenessButton.style.opacity = '0.7';
+          return;
+        }
+
+        if (!isObstacleLearned(rewardKey)) {
+          markObstacleLearned(rewardKey);
+          addAwarenessPoints(1);
+          claimAwarenessButton.textContent = 'Already learned';
+          claimAwarenessButton.disabled = true;
+          claimAwarenessButton.style.opacity = '0.7';
+
+          if (state.pausedForAwareness) {
+            startAwarenessCountdown();
+          }
+        }
+      }
+
+      function startAwarenessCountdown() {
+        if (awarenessCountdownTimer) {
+          clearTimeout(awarenessCountdownTimer);
+        }
+
+        awarenessScreen.classList.add('hidden');
+        state.paused = true;
+        syncRunnerAnimationState();
+        stopArcadeMusic();
+        awarenessCountdown.classList.remove('hidden');
+
+        let secondsRemaining = 3;
+        const showNextSecond = () => {
+          if (!state.started || state.gameOver) {
+            awarenessCountdown.classList.add('hidden');
+            awarenessCountdownTimer = null;
+            return;
+          }
+
+          awarenessCountdown.textContent = secondsRemaining > 0 ? String(secondsRemaining) : '';
+          if (secondsRemaining > 0) {
+            playAwarenessCountdownSound(secondsRemaining);
+            secondsRemaining -= 1;
+            awarenessCountdownTimer = setTimeout(showNextSecond, 1000);
+            return;
+          }
+
+          awarenessCountdown.classList.add('hidden');
+          awarenessCountdownTimer = null;
+          state.pausedForAwareness = false;
+          state.paused = false;
+          state.lastTime = performance.now();
+          syncRunnerAnimationState();
+          startVisibleLoop();
+          if (musicEnabled) {
+            startArcadeMusic();
+          }
+        };
+
+        showNextSecond();
+      }
+
+      function removeScreenVisibility() {
+        [startScreen, howToPlayScreen, pauseScreen, gameOverScreen, awarenessScreen, shopScreen].forEach((screen) => {
+          if (screen) screen.classList.add('hidden');
+        });
+      }
+
+      function renderShop() {
+        shopGrid.innerHTML = '';
+        const inventory = getShopInventory();
+        const selections = getShopSelections();
+
+        const groups = shopCatalog.reduce((acc, item) => {
+          if (!acc[item.category]) acc[item.category] = [];
+          acc[item.category].push(item);
+          return acc;
+        }, {});
+
+        Object.entries(groups).forEach(([category, items]) => {
+          const section = document.createElement('div');
+          section.className = 'shop-category';
+          section.innerHTML = `<p class="shop-category-title">${category}</p>`;
+
+          const itemList = document.createElement('div');
+          itemList.className = 'shop-item-list';
+
+          items.forEach((item) => {
+            const purchased = inventory.includes(item.id);
+            const selected = selections[item.type] === item.id;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `shop-item ${purchased ? 'purchased' : ''} ${selected ? 'selected' : ''}`;
+            button.innerHTML = `
+              <span class="shop-item-name">${item.name}</span>
+              <span class="shop-item-cost">${item.cost} AP</span>
+              <span class="shop-item-cta">${selected ? 'Selected' : (purchased ? 'Owned' : 'Buy')}</span>
+            `;
+            button.addEventListener('click', () => {
+              if (purchased) {
+                selections[item.type] = item.id;
+                saveShopSelections(selections);
+                renderShop();
+                applyShopSelections();
+                return;
+              }
+
+              if (stateAwarenessPoints < item.cost) {
+                button.blur();
+                return;
+              }
+
+              stateAwarenessPoints -= item.cost;
+              inventory.push(item.id);
+              saveShopInventory(inventory);
+              selections[item.type] = item.id;
+              saveShopSelections(selections);
+              syncAwarenessStorage();
+              renderShop();
+              applyShopSelections();
+            });
+            itemList.appendChild(button);
+          });
+
+          section.appendChild(itemList);
+          shopGrid.appendChild(section);
+        });
+      }
+
+      function applyShopSelections() {
+        const selections = getShopSelections();
+        const shell = document.getElementById('game-shell');
+        shell.classList.remove('theme-sunset', 'theme-midnight', 'theme-forest');
+        shell.classList.add(`theme-${selections.theme.replace('theme-', '')}`);
+
+        runnerEl.classList.remove('outfit-executive', 'outfit-emerald');
+        runnerEl.classList.add(selections.outfit);
+        previewRunnerEl.classList.remove('outfit-executive', 'outfit-emerald');
+        previewRunnerEl.classList.add(selections.outfit);
+
+        gameArea.classList.remove('cup-style-classic', 'cup-style-neon', 'cup-style-luxe');
+        gameArea.classList.add(`cup-style-${selections.cup.replace('cup-', '')}`);
+
+        document.documentElement.style.setProperty('--poster-surface', selections.theme === 'theme-midnight' ? '#0f172a' : selections.theme === 'theme-sunset' ? '#1d3557' : '#133b2b');
+      }
+
+      const blockedUsernameTerms = [
+        'asshole', 'bastard', 'bitch', 'bullshit', 'cunt', 'dick',
+        'fuck', 'motherfucker', 'piss', 'porn', 'pussy', 'shit',
+        'slut', 'whore'
+      ];
+
+      function isUsernameAllowed(value) {
+        const username = value.trim();
+        if (username.length < 2 || username.length > 12) return false;
+        if (!/^[a-zA-Z0-9 _-]+$/.test(username)) return false;
+
+        const normalized = username
+          .toLowerCase()
+          .replace(/0/g, 'o')
+          .replace(/1/g, 'i')
+          .replace(/3/g, 'e')
+          .replace(/4/g, 'a')
+          .replace(/5/g, 's')
+          .replace(/7/g, 't')
+          .replace(/[^a-z]/g, '');
+
+        return !blockedUsernameTerms.some((term) => normalized.includes(term));
+      }
+
+      function validateUsername() {
+        const username = usernameInput.value.trim();
+        let message = '';
+        if (username.length < 2 || username.length > 12) {
+          message = 'Username must be 2-12 characters.';
+        } else if (!isUsernameAllowed(username)) {
+          message = 'Choose a different username.';
+        }
+        usernameInput.setCustomValidity(message);
+        if (message) {
+          usernameInput.reportValidity();
+          usernameInput.focus();
+          return false;
+        }
+        return true;
       }
 
       // One-time fix for the "Guest" cloud-sync bug: any personal best without a matching
@@ -3097,9 +4439,16 @@
       }
 
       function resetGameState() {
+        state.startActionLockUntil = performance.now() + 250;
+        if (awarenessCountdownTimer) {
+          clearTimeout(awarenessCountdownTimer);
+          awarenessCountdownTimer = null;
+        }
+        awarenessCountdown.classList.add('hidden');
         state.started = false;
         state.paused = false;
         state.pausedForBackground = false;
+        state.pausedForAwareness = false;
         state.gameOver = false;
         state.score = 0;
         state.lastMilestone = 0;
@@ -3107,10 +4456,16 @@
         state.coffeeTimer = 0;
         state.lastPickupType = 'coffee';
         state.obstacleSpeed = 440;
+        state.awarenessMarker = null;
+        state.awarenessMarkerCooldown = 0;
+        state.nextAwarenessScoreTarget = Math.round(1000 + Math.random() * 1000);
         state.targetDifficultyLevel = 0;
         state.difficultyDelayRemaining = 0;
         state.airJumpsLeft = 1;
+        state.jumpBufferRemaining = 0;
+        state.fastDropJumpGraceRemaining = 0;
         state.scoreSubmitted = false;
+        state.obstaclesAvoided = 0;
         state.runner.y = 0;
         state.runner.velocityY = 0;
         clearRunnerJumpAnimation();
@@ -3118,16 +4473,22 @@
         state.obstacles = [];
         state.coffeeCups.forEach((cup) => cup.el.remove());
         state.coffeeCups = [];
+        if (obstacleCountAnimationId !== null) {
+          cancelAnimationFrame(obstacleCountAnimationId);
+          obstacleCountAnimationId = null;
+        }
+        obstaclesAvoided.textContent = '0';
+        finalScore.textContent = '0';
         scoreValue.classList.remove('score-milestone-blink');
         runnerEl.classList.remove('runner--exploding');
         runnerEl.style.transform = 'translate3d(0, 0, 0)';
         pauseScreen.classList.add('hidden');
-        syncRunnerAnimationState();
         updateHud();
       }
 
       function beginGame() {
         if (state.gameOver) return;
+        if (!validateUsername()) return;
         const enteredName = usernameInput.value.trim();
         if (enteredName) {
           state.username = enteredName;
@@ -3140,10 +4501,15 @@
         }
         applyCustomization();
         updateHud();
-        
+
+        state.jumpBufferRemaining = 0;
+        state.fastDropJumpGraceRemaining = 0;
+        state.airJumpsLeft = 1;
+        state.startActionLockUntil = performance.now() + 180;
         state.started = true;
         state.paused = false;
         state.pausedForBackground = false;
+        startVisibleLoop();
         startScreen.classList.add('hidden');
         pauseScreen.classList.add('hidden');
         gameOverScreen.classList.add('hidden');
@@ -3167,6 +4533,7 @@
         } else {
           pauseScreen.classList.add('hidden');
           state.lastTime = performance.now();
+          startVisibleLoop();
           if (musicEnabled) {
             startArcadeMusic();
           }
@@ -3195,10 +4562,8 @@
         }
       }
 
-      function jump() {
-        if (!state.started || state.paused || state.gameOver) return;
-
-        if (state.runner.y <= 0) {
+      function performJump(forceAirJump = false) {
+        if (state.runner.y <= 0 && !forceAirJump) {
           state.runner.velocityY = state.jumpVelocity;
           state.airJumpsLeft = 1;
           runnerEl.classList.remove('is-double-jumping');
@@ -3216,14 +4581,36 @@
         }
       }
 
+      function jump() {
+        if (!state.started || state.paused || state.gameOver) return;
+
+        if (state.runner.y <= 0 && state.fastDropJumpGraceRemaining > 0 && state.airJumpsLeft > 0) {
+          state.fastDropJumpGraceRemaining = 0;
+          performJump();
+          return;
+        }
+
+        if (state.runner.y <= 0 || state.airJumpsLeft > 0) {
+          performJump();
+          return;
+        }
+
+        state.jumpBufferRemaining = 140;
+      }
+
       function diveDown() {
         if (!state.started || state.paused || state.gameOver) return;
         if (state.runner.y <= 0) return;
 
         state.runner.velocityY = Math.min(state.runner.velocityY, -520);
+        state.fastDropJumpGraceRemaining = 500;
       }
 
       function handleAction() {
+        if (performance.now() < state.startActionLockUntil) {
+          return;
+        }
+
         if (!state.started && !state.gameOver) {
           beginGame();
         } else if (state.started && !state.paused && !state.gameOver) {
@@ -3254,16 +4641,21 @@
           'Unpaid Overtime': 'hourglass',
           'Cold Lunch': 'lunchbox',
           'Clogged Toilet': 'toilet',
+          'CAPTCHAs': 'captcha',
           'Captchas': 'captcha',
           'Low Battery': 'battery',
           'Spam Call': 'phone',
           'Paper Cut': 'scissors',
           'Deadlines': 'deadline',
+          'Bad Grade': 'mark',
           'Bad Mark': 'mark',
           'Broken Chair': 'chair',
           'Lost File': 'folder',
           'Blue Screen': 'bluescreen',
-          'Transit Delay': 'bus'
+          'Transit Delay': 'bus',
+          'Lost Wallet': 'wallet',
+          'Forgot Password': 'password',
+          'Broken Elevator': 'elevator'
         };
 
         if (obstacleTypes[label]) {
@@ -3294,6 +4686,15 @@
         }
         if (lower.includes('ticket') || lower.includes('traffic') || lower.includes('delay') || lower.includes('late') || lower.includes('warning')) {
           return 'warning';
+        }
+        if (lower.includes('wallet') || lower.includes('purse')) {
+          return 'wallet';
+        }
+        if (lower.includes('elevator') || lower.includes('lift')) {
+          return 'elevator';
+        }
+        if (lower.includes('password') || lower.includes('login') || lower.includes('forgot')) {
+          return 'password';
         }
         if (lower.includes('laptop') || lower.includes('computer')) {
           return 'laptop';
@@ -3390,7 +4791,7 @@
                 <rect x="9" y="3" width="3" height="4" fill="#7a1e2d"/>
                 <rect x="20" y="3" width="3" height="4" fill="#7a1e2d"/>
                 <rect x="6" y="6" width="20" height="22" rx="1" fill="#7a1e2d"/>
-                <rect x="8" y="8" width="16" height="18" fill="#ffffff"/>
+                <rect x="8" y="8" width="16" height="18" fill="#ffb3bf"/>
                 <rect x="8" y="8" width="16" height="6" fill="#ff8ea1"/>
                 <rect x="10" y="17" width="3" height="3" fill="#ff8ea1"/>
                 <rect x="15" y="17" width="3" height="3" fill="#ff8ea1"/>
@@ -3442,9 +4843,9 @@
           case 'card':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="3" y="7" width="26" height="18" fill="#7a1e2d"/><rect x="5" y="9" width="22" height="14" fill="#ff8ea1"/><rect x="5" y="12" width="22" height="3" fill="#ffd6de"/><rect x="9" y="18" width="8" height="2" fill="#d92d4d"/><path d="M20 17l4 4m0-4l-4 4" stroke="#d92d4d" stroke-width="2"/></svg>`;
           case 'fuel':
-            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="8" y="7" width="15" height="21" fill="#7a1e2d"/><rect x="11" y="10" width="9" height="7" fill="#ffd6de"/><rect x="12" y="12" width="7" height="3" fill="#ff8ea1"/><path d="M23 11h4v12h-4m4-8l3 3v5h-3" fill="none" stroke="#7a1e2d" stroke-width="2"/><rect x="13" y="20" width="5" height="3" fill="#ff8ea1"/></svg>`;
+            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="8" y="7" width="15" height="21" fill="#7a1e2d"/><rect x="10" y="9" width="11" height="17" fill="#ff8ea1"/><rect x="11" y="10" width="9" height="7" fill="#ffd6de"/><rect x="12" y="12" width="7" height="3" fill="#ff8ea1"/><path d="M23 11h4v12h-4m4-8l3 3v5h-3" fill="none" stroke="#7a1e2d" stroke-width="2"/><rect x="13" y="20" width="5" height="3" fill="#ff8ea1"/></svg>`;
           case 'keyboard':
-            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="3" y="9" width="26" height="16" fill="#7a1e2d"/><rect x="5" y="11" width="22" height="12" fill="#ffd6de"/><path d="M7 14h3m2 0h3m2 0h3m2 0h3M7 18h2m2 0h2m2 0h2m2 0h2m2 0h2M9 21h14" stroke="#7a1e2d" stroke-width="2"/><circle cx="25" cy="7" r="2" fill="#ff8ea1"/></svg>`;
+            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="3" y="9" width="26" height="16" fill="#7a1e2d"/><rect x="5" y="11" width="22" height="12" fill="#ffd6de"/><path d="M7 14h3m2 0h3m2 0h3m2 0h3M7 18h2m2 0h2m2 0h2m2 0h2m2 0h2M9 21h14" stroke="#7a1e2d" stroke-width="2"/><path d="M20 8c2-3 7-2 7 1 0 2-2 3-4 3h-5c-1 0-2-1-1-2 1-1 2-1 3-2z" fill="#ff8ea1" stroke="#7a1e2d" stroke-width="1"/><path d="M24 5v-2M28 8l2-1" stroke="#ff8ea1" stroke-width="2"/><path d="M21 9h4" stroke="#ffd6de" stroke-width="1"/></svg>`;
           case 'ticket':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M4 8h24v5a3 3 0 000 6v5H4v-5a3 3 0 000-6z" fill="#7a1e2d"/><path d="M6 10h20v3a5 5 0 000 6v3H6v-3a5 5 0 000-6z" fill="#ff8ea1"/><path d="M16 11v10" stroke="#ffd6de" stroke-width="2"/><path d="M10 14h3m6 4h3" stroke="#7a1e2d" stroke-width="2"/></svg>`;
           case 'traffic':
@@ -3452,19 +4853,114 @@
           case 'hourglass':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="7" y="4" width="18" height="3" fill="#7a1e2d"/><rect x="7" y="25" width="18" height="3" fill="#7a1e2d"/><path d="M10 7h12c0 6-3 7-6 9 3 2 6 3 6 9H10c0-6 3-7 6-9-3-2-6-3-6-9z" fill="#ff8ea1" stroke="#7a1e2d" stroke-width="2"/><path d="M13 9h6l-3 5zM16 18l3 5h-6z" fill="#ffd6de"/></svg>`;
           case 'lunchbox':
-            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="5" y="10" width="22" height="17" rx="2" fill="#7a1e2d"/><rect x="7" y="13" width="18" height="12" fill="#ff8ea1"/><path d="M11 10V7h10v3" fill="none" stroke="#7a1e2d" stroke-width="2"/><rect x="13" y="16" width="6" height="4" fill="#ffd6de"/><rect x="9" y="21" width="14" height="2" fill="#7a1e2d"/></svg>`;
+            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M5 6h22v2h2v7H3V8h2z" fill="#7a1e2d"/><path d="M7 8h18v1h2v4H5V9h2z" fill="#ff8ea1"/><rect x="5" y="15" width="22" height="3" fill="#d92d4d"/><rect x="7" y="18" width="18" height="2" fill="#ffd6de"/><path d="M3 20h26v6H3z" fill="#7a1e2d"/><path d="M5 21h22v3H5z" fill="#ff8ea1"/><rect x="8" y="9" width="4" height="2" fill="#ffd6de"/><rect x="18" y="9" width="5" height="2" fill="#ffd6de"/></svg>`;
           case 'toilet':
-            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="8" y="3" width="16" height="13" fill="#7a1e2d"/><rect x="10" y="5" width="12" height="9" fill="#ffd6de"/><rect x="11" y="6" width="10" height="3" fill="#ffffff"/><rect x="23" y="7" width="4" height="2" fill="#7a1e2d"/><rect x="26" y="8" width="2" height="6" fill="#7a1e2d"/><rect x="25" y="13" width="3" height="2" fill="#ff8ea1"/><path d="M6 15h20v3H6z" fill="#7a1e2d"/><path d="M8 17h16c0 7-3 11-8 11s-8-4-8-11z" fill="#7a1e2d"/><path d="M11 19h10c0 4-2 6-5 6s-5-2-5-6z" fill="#ff8ea1"/><path d="M12 20h8m-5 2h2" stroke="#ffd6de" stroke-width="2"/><rect x="5" y="27" width="22" height="2" fill="#7a1e2d"/></svg>`;
+            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="8" y="3" width="16" height="13" fill="#7a1e2d"/><rect x="10" y="5" width="12" height="9" fill="#ffd6de"/><rect x="11" y="6" width="10" height="3" fill="#ffb3bf"/><rect x="23" y="7" width="4" height="2" fill="#7a1e2d"/><rect x="26" y="8" width="2" height="6" fill="#7a1e2d"/><rect x="25" y="13" width="3" height="2" fill="#ff8ea1"/><path d="M6 15h20v3H6z" fill="#7a1e2d"/><path d="M8 17h16c0 7-3 11-8 11s-8-4-8-11z" fill="#7a1e2d"/><path d="M11 19h10c0 4-2 6-5 6s-5-2-5-6z" fill="#ff8ea1"/><path d="M12 20h8m-5 2h2" stroke="#ffd6de" stroke-width="2"/><rect x="5" y="27" width="22" height="2" fill="#7a1e2d"/></svg>`;
+          case 'captcha':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <path d="M5 14V5l7 5c2-1 6-1 8 0l7-5v9c0 8-5 13-11 13S5 22 5 14z" fill="#ff8ea1" stroke="#7a1e2d" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M10 16q2-3 4 0M18 16q2-3 4 0" fill="none" stroke="#7a1e2d" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M14 20l2 2 2-2-2-1z" fill="#ffd6de" stroke="#7a1e2d" stroke-width="1" stroke-linejoin="round"/>
+                <path d="M14 22h4M11 21H4m7 2H5m16-2h7m-7 2h6" fill="none" stroke="#7a1e2d" stroke-width="1" stroke-linecap="round"/>
+              </svg>
+            `;
+          case 'scissors':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <path d="M7 4h14l5 5v18H7z" fill="#7a1e2d"/>
+                <path d="M9 6h11l4 4v15H9z" fill="#ff8ea1"/>
+                <path d="M21 6v5h5" fill="#ffd6de"/>
+                <path d="M21 6l2 2-2 2 3 2h2l-5-6z" fill="#7a1e2d"/>
+                <path d="M12 14h9M12 18h9M12 22h6" stroke="#d92d4d" stroke-width="2" stroke-linecap="square"/>
+                <path d="M23 12l-3 3 3 3" fill="none" stroke="#7a1e2d" stroke-width="2" stroke-linecap="square"/>
+              </svg>
+            `;
           case 'report':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M6 4h15l5 5v19H6z" fill="#7a1e2d"/><path d="M21 4v7h5" fill="#ffd6de"/><rect x="9" y="14" width="3" height="9" fill="#ff8ea1"/><rect x="14" y="17" width="3" height="6" fill="#ff8ea1"/><rect x="19" y="12" width="3" height="11" fill="#ff8ea1"/><path d="M9 11h12" stroke="#ffd6de" stroke-width="2"/></svg>`;
+          case 'deadline':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <path d="M8 4h12l6 6v14a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z" fill="#7a1e2d"/>
+                <path d="M10 6h10l5 5v13a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z" fill="#ffb3bf"/>
+                <path d="M20 6v5h5" fill="none" stroke="#7a1e2d" stroke-width="2"/>
+                <rect x="9" y="14" width="10" height="2" fill="#d92d4d"/>
+                <rect x="9" y="18" width="10" height="2" fill="#d92d4d"/>
+                <rect x="9" y="22" width="7" height="2" fill="#d92d4d"/>
+                <circle cx="22" cy="19" r="6" fill="#ff8ea1" stroke="#7a1e2d" stroke-width="2"/>
+                <path d="M22 15v4l3 2" fill="none" stroke="#7a1e2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            `;
           case 'mark':
-            return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M6 3h15l5 5v21H6z" fill="#7a1e2d"/><path d="M9 6h11v5h4v15H9z" fill="#ffb3bf"/><path d="M21 6v5h5" fill="#ffd6de"/><text x="16" y="23" text-anchor="middle" fill="#7a1e2d" font-size="15" font-weight="900" font-family="Courier New, monospace">F</text></svg>`;
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <path d="M7 4h14l5 5v19H7z" fill="#7a1e2d"/>
+                <path d="M9 6h11l4 4v16H9z" fill="#ffb3bf"/>
+                <path d="M20 6v5h5" fill="none" stroke="#ffd6de" stroke-width="2"/>
+                <circle cx="16.5" cy="17" r="6" fill="none" stroke="#d92d4d" stroke-width="2"/>
+                <text x="16.5" y="21" text-anchor="middle" fill="#d92d4d" font-size="10" font-weight="900" font-family="Courier New, monospace">F</text>
+              </svg>
+            `;
+          case 'phone':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <rect x="6" y="3" width="20" height="26" rx="3" fill="#7a1e2d"/>
+                <rect x="8" y="6" width="16" height="18" rx="1" fill="#ff8ea1"/>
+                <rect x="13" y="4" width="6" height="1" fill="#ffd6de"/>
+                <circle cx="16" cy="27" r="1" fill="#ffd6de"/>
+                <text x="16" y="20" text-anchor="middle" fill="#7a1e2d" font-size="13" font-weight="900" font-family="Courier New, monospace">!</text>
+              </svg>
+            `;
+          case 'elevator':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <g transform="translate(2 0) scale(0.875 1)">
+                <rect x="4" y="3" width="24" height="26" fill="#7a1e2d"/>
+                <rect x="7" y="7" width="18" height="19" fill="#ff8ea1"/>
+                <rect x="15" y="7" width="2" height="19" fill="#7a1e2d"/>
+                <rect x="12" y="4" width="8" height="2" fill="#ffd6de"/>
+                <path d="M10 11l12 11M22 11L10 22" stroke="#d92d4d" stroke-width="2"/>
+                </g>
+              </svg>
+            `;
+          case 'battery':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <rect x="4" y="10" width="22" height="12" fill="#7a1e2d"/>
+                <rect x="6" y="12" width="18" height="8" fill="#ffb3bf"/>
+                <rect x="26" y="14" width="3" height="4" fill="#7a1e2d"/>
+                <rect x="8" y="14" width="4" height="4" fill="#d92d4d"/>
+                <rect x="13" y="14" width="4" height="4" fill="#ff8ea1"/>
+                <rect x="18" y="14" width="4" height="4" fill="#ff8ea1"/>
+              </svg>
+            `;
+          case 'password':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <path d="M10 15V11a6 6 0 0 1 12 0v4" fill="none" stroke="#7a1e2d" stroke-width="4"/>
+                <path d="M12 15V11a4 4 0 0 1 8 0v4" fill="none" stroke="#ff8ea1" stroke-width="2"/>
+                <rect x="6" y="13" width="20" height="14" rx="3" fill="#7a1e2d"/>
+                <rect x="8" y="15" width="16" height="10" rx="2" fill="#ff8ea1"/>
+                <text x="16" y="24" text-anchor="middle" fill="#7a1e2d" font-size="12" font-weight="900" font-family="Courier New, monospace">?</text>
+              </svg>
+            `;
           case 'folder':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M4 8h10l3 3h11v16H4z" fill="#7a1e2d"/><path d="M6 12h20v12H6z" fill="#ff8ea1"/><path d="M6 12h20l-2 4H6z" fill="#ffd6de"/><path d="M18 17l5 5m0-5l-5 5" stroke="#7a1e2d" stroke-width="2"/></svg>`;
           case 'bluescreen':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="4" y="5" width="24" height="18" fill="#7a1e2d"/><rect x="7" y="8" width="18" height="12" fill="#ff8ea1"/><path d="M11 13h3m4 0h3M11 18q5-5 10 0" fill="none" stroke="#7a1e2d" stroke-width="2"/><path d="M12 23h8v3H12z" fill="#7a1e2d"/><rect x="8" y="26" width="16" height="2" fill="#7a1e2d"/></svg>`;
           case 'bus':
             return `<svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges"><rect x="4" y="7" width="24" height="19" rx="2" fill="#7a1e2d"/><rect x="7" y="10" width="18" height="8" fill="#ffd6de"/><rect x="9" y="12" width="5" height="4" fill="#ff8ea1"/><rect x="16" y="12" width="7" height="4" fill="#ff8ea1"/><circle cx="10" cy="26" r="3" fill="#7a1e2d"/><circle cx="22" cy="26" r="3" fill="#7a1e2d"/><rect x="6" y="20" width="20" height="2" fill="#ff8ea1"/></svg>`;
+          case 'wallet':
+            return `
+              <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+                <rect x="4" y="9" width="24" height="17" rx="3" fill="#7a1e2d"/>
+                <rect x="6" y="11" width="20" height="13" rx="2" fill="#ff8ea1"/>
+                <path d="M6 14h20" stroke="#7a1e2d" stroke-width="2"/>
+                <path d="M7 11h16l3 3H7z" fill="#ffd6de"/>
+                <rect x="20" y="14" width="5" height="3" rx="1" fill="#7a1e2d"/>
+                <rect x="21" y="15" width="3" height="1" fill="#ff8ea1"/>
+              </svg>
+            `;
           default: // briefcase
             return `
               <svg class="obstacle-svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
@@ -3529,8 +5025,28 @@
           height,
           el: obstacleEl,
           passed: false,
-          airborne: isFlyingStapler
+          airborne: isFlyingStapler,
+          label
         };
+
+        const handleAwarenessTargetInteraction = (event) => {
+          const activeAwarenessObstacle = state.awarenessMarker?.obstacle;
+          if (!activeAwarenessObstacle || activeAwarenessObstacle !== obstacle) {
+            return;
+          }
+
+          if (event && typeof event.preventDefault === 'function') {
+            event.preventDefault();
+          }
+          if (event && typeof event.stopPropagation === 'function') {
+            event.stopPropagation();
+          }
+          playSelectSound();
+          openAwarenessMode(obstacle);
+        };
+
+        obstacleEl.addEventListener('pointerdown', handleAwarenessTargetInteraction);
+        obstacleEl.addEventListener('click', handleAwarenessTargetInteraction);
 
         state.obstacles.push(obstacle);
       }
@@ -3670,22 +5186,41 @@
         });
       }
 
+      function finalizeAvoidedObjects() {
+        state.obstacles.forEach((obstacle) => {
+          if (!obstacle.passed && obstacle.x + obstacle.width < state.runner.x) {
+            obstacle.passed = true;
+            state.obstaclesAvoided += 1;
+            state.score += 25;
+          }
+        });
+
+        state.coffeeCups.forEach((cup) => {
+          if (cup.flying && cup.kind === 'money' && !cup.passed && cup.x + cup.width < state.runner.x) {
+            cup.passed = true;
+            state.obstaclesAvoided += 1;
+          }
+        });
+      }
+
       function endGame() {
         if (state.gameOver) return;
 
+        finalizeAvoidedObjects();
         state.gameOver = true;
         state.started = false;
         state.paused = false;
+        stopVisibleLoop();
         syncRunnerAnimationState();
         stopArcadeMusic();
-        
+
         playHitSound();
         clearRunnerJumpAnimation();
         randomizeExplosion();
         runnerEl.classList.add('runner--exploding');
 
         const finalScoreVal = Math.floor(state.score);
-        finalScore.textContent = String(finalScoreVal);
+        animateGameOverTotals(finalScoreVal, state.obstaclesAvoided);
 
         const previousBest = getPersonalBest();
         const isNewBest = finalScoreVal > previousBest;
@@ -3704,10 +5239,24 @@
       }
 
       function update(delta) {
-        if (!state.started || state.paused || state.gameOver) return;
+
 
         // Advance scoring, difficulty, spawning, physics, movement, and collisions together.
+        state.jumpBufferRemaining = Math.max(0, state.jumpBufferRemaining - delta);
+        state.fastDropJumpGraceRemaining = Math.max(0, state.fastDropJumpGraceRemaining - delta);
         state.score += delta * 0.012;
+        state.awarenessMarkerCooldown = Math.max(0, state.awarenessMarkerCooldown - delta);
+
+        if (
+          state.started &&
+          !state.paused &&
+          !state.gameOver &&
+          !state.awarenessMarker?.obstacle &&
+          state.score >= (state.nextAwarenessScoreTarget || 1500)
+        ) {
+          triggerNextAwarenessTarget();
+        }
+
         const difficultyLevel = Math.floor(state.score / 1000);
         if (difficultyLevel > state.targetDifficultyLevel) {
           state.targetDifficultyLevel = difficultyLevel;
@@ -3753,10 +5302,19 @@
           state.runner.velocityY = 0;
           state.airJumpsLeft = 1;
           clearRunnerJumpAnimation();
+          if (state.jumpBufferRemaining > 0) {
+            state.jumpBufferRemaining = 0;
+            performJump();
+          }
         }
 
         runnerEl.style.transform = `translate3d(0, ${-state.runner.y}px, 0)`;
-        const runnerRect = runnerEl.getBoundingClientRect();
+        const adjustedRunner = {
+          left: state.runner.x + 9,
+          right: state.runner.x + state.runner.width - 9,
+          top: state.runner.y + 7,
+          bottom: state.runner.y + state.runner.height - 6
+        };
 
         for (let i = state.obstacles.length - 1; i >= 0; i--) {
           const obstacle = state.obstacles[i];
@@ -3767,12 +5325,17 @@
 
           if (!obstacle.passed && obstacle.x + obstacle.width < state.runner.x) {
             obstacle.passed = true;
+            state.obstaclesAvoided += 1;
             state.score += 25;
           }
 
-          const obstacleRect = obstacle.el.querySelector('.obstacle-item').getBoundingClientRect();
-          const adjustedRunner = makeHitbox(runnerRect, { left: 9, right: 9, top: 7, bottom: 6 });
-          const adjustedObstacle = makeHitbox(obstacleRect, { left: 6, right: 6, top: 4, bottom: 4 });
+          const obstacleHeight = obstacle.airborne ? 26 : 48;
+          const adjustedObstacle = {
+            left: obstacle.x + 6,
+            right: obstacle.x + obstacle.width - 6,
+            top: obstacle.y + 4,
+            bottom: obstacle.y + obstacleHeight - 4
+          };
           const obstacleTravel = previousObstacleX - obstacle.x;
           // Cap the tunneling-prevention sweep to the artwork's own width.
           const sweepExtension = Math.max(0, Math.min(obstacleTravel, adjustedObstacle.right - adjustedObstacle.left));
@@ -3783,7 +5346,17 @@
             return;
           }
 
-          if (obstacle.x + obstacle.width < -40) {
+          if (obstacle.x + obstacle.width < 0) {
+            if (state.awarenessMarker?.obstacle === obstacle) {
+              hideAwarenessMarker();
+              state.awarenessMarkerCooldown = 0;
+            }
+
+            if (obstacle.el) {
+              obstacle.el.classList.remove('awareness-target');
+              obstacle.el.classList.remove('awareness-glow');
+            }
+
             obstacle.el.remove();
             state.obstacles.splice(i, 1);
           }
@@ -3803,16 +5376,13 @@
             cup.el.style.bottom = '30px';
           }
 
-          const runnerBox = getRunnerBox();
-          let adjustedRunner = {
-            left: runnerBox.left,
-            right: runnerBox.right,
-            top: state.runner.y + 12,
-            bottom: state.runner.y + state.runner.height
-          };
+          if (cup.flying && cup.kind === 'money' && !cup.passed && cup.x + cup.width < state.runner.x) {
+            cup.passed = true;
+            state.obstaclesAvoided += 1;
+          }
 
           const hoverOffset = cup.flying ? Math.sin(cup.bob) * 16 : 0;
-          let adjustedCup = {
+          const adjustedCup = {
             left: cup.x,
             right: cup.x + cup.width,
             top: cup.flying ? cup.y + hoverOffset : 12,
@@ -3820,10 +5390,10 @@
           };
 
           if (cup.flying) {
-            // Airborne money uses its rendered bounds because it moves vertically with the bob animation.
-            const cupRect = cup.el.getBoundingClientRect();
-            adjustedRunner = makeHitbox(runnerRect, { left: 8, right: 8, top: 2, bottom: 2 });
-            adjustedCup = makeHitbox(cupRect, { left: 1, right: 1, top: 1, bottom: 1 });
+            adjustedCup.left -= 5;
+            adjustedCup.right += 5;
+            adjustedCup.top -= 8;
+            adjustedCup.bottom += 8;
           }
 
           if (collides(adjustedRunner, adjustedCup)) {
@@ -3847,6 +5417,7 @@
         }
 
         updateHud();
+        updateAwarenessMarker();
       }
 
       function startVisibleLoop() {
@@ -3875,13 +5446,34 @@
         const delta = Math.min(timestamp - (state.lastTime || timestamp), 80);
         state.lastTime = timestamp;
         update(delta);
-        animationFrameId = requestAnimationFrame(gameLoop);
+        if (state.started && !state.paused && !state.gameOver) {
+          animationFrameId = requestAnimationFrame(gameLoop);
+        } else {
+          animationFrameId = null;
+        }
       }
 
-      startButton.addEventListener('click', () => {
+      startButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        state.jumpBufferRemaining = 0;
+        state.fastDropJumpGraceRemaining = 0;
+        state.startActionLockUntil = performance.now() + 180;
         playSelectSound();
         resetGameState();
         beginGame();
+      });
+
+      shopButton.addEventListener('click', () => {
+        playSelectSound();
+        startScreen.classList.add('hidden');
+        shopScreen.classList.remove('hidden');
+      });
+
+      closeShopButton.addEventListener('click', () => {
+        playSelectSound();
+        shopScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
       });
 
       howToPlayButton.addEventListener('click', () => {
@@ -3896,7 +5488,12 @@
         startScreen.classList.remove('hidden');
       });
 
-      restartButton.addEventListener('click', () => {
+      restartButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        state.jumpBufferRemaining = 0;
+        state.fastDropJumpGraceRemaining = 0;
+        state.startActionLockUntil = performance.now() + 180;
         playSelectSound();
         resetGameState();
         beginGame();
@@ -3916,6 +5513,41 @@
         }
       });
 
+      awarenessPointsButton.addEventListener('click', () => {
+        playSelectSound();
+        openAwarenessPointsInfo();
+      });
+
+      awarenessButton.addEventListener('click', () => {
+        playSelectSound();
+        openAwarenessMode();
+      });
+
+      claimAwarenessButton.addEventListener('click', () => {
+        playSelectSound();
+        claimAwarenessReward();
+      });
+
+      closeAwarenessButton.addEventListener('click', () => {
+        playSelectSound();
+        awarenessScreen.classList.add('hidden');
+        if (state.pausedForAwareness && state.started && !state.gameOver) {
+          state.pausedForAwareness = false;
+          state.paused = false;
+          state.lastTime = performance.now();
+          syncRunnerAnimationState();
+          startVisibleLoop();
+          if (musicEnabled) {
+            startArcadeMusic();
+          }
+          return;
+        }
+        if (state.started) {
+          return;
+        }
+        startScreen.classList.remove('hidden');
+      });
+
       pauseToggle.addEventListener('click', () => {
         playSelectSound();
         togglePause();
@@ -3929,6 +5561,10 @@
       quitToMenuButton.addEventListener('click', () => {
         playSelectSound();
         quitToMenu();
+      });
+
+      usernameInput.addEventListener('input', () => {
+        usernameInput.setCustomValidity('');
       });
 
       usernameInput.addEventListener('keydown', (e) => {
@@ -3948,13 +5584,28 @@
       window.addEventListener('blur', pauseForBackground);
 
       document.addEventListener('keydown', (event) => {
+        const isJumpAction = event.code === 'Space' || event.code === 'ArrowUp' || event.code === 'KeyW';
+        const isDiveAction = event.code === 'KeyS' || event.code === 'ArrowDown';
+
+        if (performance.now() < state.startActionLockUntil) {
+          if (isJumpAction || isDiveAction || event.code === 'Escape') {
+            event.preventDefault();
+          }
+          return;
+        }
+
+        if (event.repeat && (isJumpAction || isDiveAction)) {
+          event.preventDefault();
+          return;
+        }
+
         // Prevent Tab from handing focus to the browser's own UI, which fires a window blur and falsely triggers pauseForBackground.
         if (event.code === 'Tab' && document.activeElement !== usernameInput) {
           event.preventDefault();
           return;
         }
 
-        if (event.code === 'KeyP' || event.code === 'Escape') {
+        if (event.code === 'Escape') {
           if (state.started && !state.gameOver) {
             event.preventDefault();
             togglePause();
@@ -3962,14 +5613,14 @@
           return;
         }
 
-        if (event.code === 'Space' || event.code === 'ArrowUp' || event.code === 'KeyW') {
-          if (document.activeElement === usernameInput) return;
+        if (isJumpAction) {
+          if (document.activeElement && document.activeElement.closest('input, textarea, select')) return;
           event.preventDefault();
           handleAction();
         }
 
-        if (event.code === 'KeyS' || event.code === 'ArrowDown') {
-          if (document.activeElement === usernameInput) return;
+        if (isDiveAction) {
+          if (document.activeElement && document.activeElement.closest('input, textarea, select')) return;
           if (!state.started || state.paused || state.gameOver) return;
           event.preventDefault();
           diveDown();
@@ -3978,8 +5629,22 @@
 
       gameArea.addEventListener('pointerdown', (event) => {
         if (event.button !== 0) return;
-        if (event.target.closest('button') || event.target.closest('.swatch-grid')) return;
-        handleAction();
+
+        if (performance.now() < state.startActionLockUntil) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+
+        if (event.target.closest('button, input, textarea, select, .screen, .panel')) return;
+
+        // Left-clicks on the game area must never trigger a jump by accident.
+        // Only the explicit jump controls should move the runner.
+        if (!state.started || state.paused || state.gameOver) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
       });
 
       window.__officeRushAudio = {
@@ -3999,6 +5664,8 @@
       }
 
       applyCustomization();
+      applyShopSelections();
+      renderShop();
       updateMenuPersonalBest();
       syncPersonalBestFromCloud(state.username);
       updateMusicToggleLabel();
