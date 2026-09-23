@@ -2500,6 +2500,7 @@
           );
           height: auto;
           aspect-ratio: 16 / 9;
+          min-height: 0;
           max-height: none;
         }
 
@@ -2568,7 +2569,15 @@
         .panel,
         .how-to-play-panel {
           max-height: calc(100% - 16px);
+          overflow-y: auto;
           padding: 0.55rem 0.65rem 0.6rem;
+        }
+
+        #start-screen .actions {
+          position: sticky;
+          bottom: 0;
+          padding-top: 0.45rem;
+          background: #0d1620;
         }
 
         .how-to-play-list {
