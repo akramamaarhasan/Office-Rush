@@ -326,6 +326,13 @@
         inset: 0;
         overflow: hidden;
         touch-action: manipulation;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      button {
+        -webkit-user-select: none;
+        user-select: none;
       }
 
       .game-area.is-paused *,
@@ -1831,18 +1838,17 @@
         display: grid;
         place-items: center;
         color: var(--secondary);
-        font-family: "Courier New", monospace;
+        font-family: inherit;
         font-size: clamp(4rem, 12vw, 8rem);
         font-weight: 900;
-        letter-spacing: 0.14em;
+        letter-spacing: 0;
         font-variant-numeric: tabular-nums;
-        -webkit-text-stroke: 1px #0d1722;
+        image-rendering: auto;
+        text-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
         text-shadow:
-          3px 0 0 #0d1722,
-          -3px 0 0 #0d1722,
-          0 3px 0 #0d1722,
-          0 -3px 0 #0d1722,
-          0 0 10px rgba(125, 249, 178, 0.5);
+          2px 2px 0 #0d1722,
+          0 0 12px rgba(125, 249, 178, 0.6);
         pointer-events: none;
       }
 
@@ -2342,6 +2348,141 @@
         min-width: 120px;
       }
 
+      @media (max-width: 600px) {
+        html,
+        body {
+          min-height: 100%;
+          height: 100%;
+        }
+
+        body {
+          padding: 10px;
+          place-items: center;
+        }
+
+        .game-shell {
+          width: 100%;
+          height: min(calc(100svh - 20px), 760px);
+          min-height: 0;
+          max-height: none;
+          aspect-ratio: auto;
+          border-width: 3px;
+        }
+
+        .hud {
+          top: 10px;
+          left: 12px;
+          right: 12px;
+          gap: 6px;
+        }
+
+        .hud-row {
+          align-items: center;
+        }
+
+        .chip-group,
+        .chip-group.player-group,
+        .chip-group.score-group {
+          min-height: 40px;
+          height: 40px;
+          gap: 5px;
+        }
+
+        .score-group .chip {
+          width: 112px;
+        }
+
+        .score-group .awareness-chip {
+          width: 40px;
+          min-width: 40px;
+        }
+
+        .chip {
+          min-height: 40px;
+          height: 40px;
+          border-width: 3px;
+          border-radius: 7px;
+          padding: 0 8px;
+          box-shadow: 0 0 0 3px #1c2b3d, 0 4px 0 rgba(0,0,0,0.35);
+        }
+
+        .chip-label {
+          font-size: 0.5rem;
+          letter-spacing: 0.12em;
+        }
+
+        .chip-value {
+          font-size: 1.05rem;
+          letter-spacing: 0.04em;
+        }
+
+        .awareness-icon {
+          transform: scale(0.78);
+        }
+
+        .player-stack {
+          height: 40px;
+          gap: 5px;
+        }
+
+        .control-row {
+          gap: 5px;
+        }
+
+        .chip.music-toggle,
+        .chip.pause-toggle,
+        .chip.awareness-help-toggle {
+          min-width: 40px;
+          width: 40px;
+          height: 40px;
+          padding: 0;
+        }
+
+        .chip.music-toggle span,
+        .chip.pause-toggle span,
+        .chip.awareness-help-toggle span {
+          font-size: 1rem;
+        }
+
+        .awareness-help-toggle::after {
+          top: calc(100% + 6px);
+          right: 0;
+          width: min(220px, 68vw);
+          font-size: 0.62rem;
+        }
+
+        .screen {
+          padding: 12px;
+        }
+
+        .panel,
+        .how-to-play-panel {
+          width: min(94%, 420px);
+          max-height: calc(100% - 24px);
+          overflow-y: auto;
+          padding: 0.8rem 0.7rem 0.85rem;
+        }
+
+        h1 {
+          font-size: 1.25rem;
+        }
+
+        .actions {
+          gap: 0.55rem;
+        }
+
+        .action-btn {
+          min-width: 120px;
+          min-height: 42px;
+          padding: 0.58rem 0.8rem;
+          font-size: 0.68rem;
+        }
+
+        .awareness-countdown {
+          font-size: clamp(4.5rem, 25vw, 7rem);
+        }
+      }
+
       .how-to-play-list {
         display: grid;
         gap: 0.45rem;
@@ -2644,6 +2785,7 @@
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8595;</span><span class="how-to-play-copy"><strong>Fast Drop:</strong> Hold S or Down Arrow to move down quickly.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">!</span><span class="how-to-play-copy"><strong>Hazards:</strong> Red objects are dangerous. Avoid them.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon coffee-icon" aria-hidden="true"></span><span class="how-to-play-copy"><strong>Coffee:</strong> Collect coffee for 100 points.</span></div>
+            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">?</span><span class="how-to-play-copy"><strong>Awareness:</strong> Tap the ? button on the top right when a green, glowing obstacle appears to learn about it.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#10074;&#10074;</span><span class="how-to-play-copy"><strong>Pause:</strong> Press P, Escape, or the pause button.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon goal-icon" aria-hidden="true"></span><span class="how-to-play-copy"><strong>Goal:</strong> Survive as long as possible and set the highest score.</span></div>
           </div>
@@ -2831,18 +2973,25 @@
           }
 
           const now = audioCtx.currentTime;
-          const osc = audioCtx.createOscillator();
-          const gainNode = audioCtx.createGain();
-          const frequency = secondsRemaining === 1 ? 660 : secondsRemaining === 2 ? 494 : 370;
+          const frequency = secondsRemaining === 1 ? 659.25 : secondsRemaining === 2 ? 523.25 : 392;
+          const duration = 0.2;
+          const voices = [
+            { type: 'square', multiplier: 1, volume: 0.055 },
+            { type: 'triangle', multiplier: 2, volume: 0.018 }
+          ];
 
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(frequency, now);
-          gainNode.gain.setValueAtTime(0.06, now);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-          osc.connect(gainNode);
-          gainNode.connect(audioCtx.destination);
-          osc.start(now);
-          osc.stop(now + 0.16);
+          voices.forEach(({ type, multiplier, volume }) => {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(frequency * multiplier, now);
+            gainNode.gain.setValueAtTime(volume, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+          });
         } catch (error) {
           console.error('Countdown audio error:', error);
         }
@@ -3642,7 +3791,7 @@
         'Urgent Email': {
           title: 'Urgent Email',
           kind: 'ground',
-          effect: 'Stay on top of your emails or Gerald is going to nag at you!',
+          effect: 'Stay on top of your urgent emails or Gerald is going to nag at you!',
           example: 'Touching this obstacle ends the run.'
         },
         'Printer Jam': {
@@ -3654,7 +3803,7 @@
         'Card Declined': {
           title: 'Card Declined',
           kind: 'ground',
-          effect: 'Trying to buy lunch only to realize your card did not go through in front of everyone... Awkward!',
+          effect: 'Make sure to have enough funds in your account before making a purchase.',
           example: 'Touching this obstacle ends the run.'
         },
         'Gas Prices': {
@@ -3690,7 +3839,7 @@
         'Traffic Jam': {
           title: 'Traffic Jam',
           kind: 'ground',
-          effect: 'PAY ATTENTION TO THE TRAFFIC LIGHTS!',
+          effect: 'Pay serious attention if you are in a traffic jam!',
           example: 'Touching this obstacle ends the run.'
         },
         'Late Meeting': {
@@ -3762,7 +3911,7 @@
         'Bad Grade': {
           title: 'Bad Grade',
           kind: 'ground',
-          effect: 'Study study study study study... did I say study?',
+          effect: 'Study study study study study... wait, did I say study?',
           example: 'Touching this obstacle ends the run.'
         },
         'Broken Chair': {
@@ -3780,7 +3929,7 @@
         'Blue Screen': {
           title: 'Blue Screen',
           kind: 'ground',
-          effect: 'Contact the administrator for further help.',
+          effect: 'Contact the IT team for further help.',
           example: 'Touching this obstacle ends the run.'
         },
         'Transit Delay': {
@@ -3792,19 +3941,19 @@
         'Forgot Password': {
           title: 'Forgot Password',
           kind: 'ground',
-          effect: 'INSERT TEXT HERE',
+          effect: 'Maybe your password was DiNoSaUr2@4022402@42133131@? Just press forgot password bro.',
           example: 'Touching this obstacle ends the run.'
         },
         'Broken Elevator': {
           title: 'Broken Elevator',
           kind: 'ground',
-          effect: 'An office logistics hazard that ends the run if you collide with it.',
+          effect: 'And to the stairs we go!',
           example: 'Touching this obstacle ends the run.'
         },
         'Flying Money': {
           title: 'Flying Money',
           kind: 'money',
-          effect: 'The money looks like a reward, but it is a trap in motion. If it reaches you, it ends the run as a collision hazard.',
+          effect: 'Cash flies by. Keep your eyes on your passion.',
           example: 'Touching this obstacle ends the run.'
         },
         coffee: {
@@ -5698,6 +5847,7 @@
         event.preventDefault();
         event.stopPropagation();
         playSelectSound();
+        clearActiveInputState();
         awarenessScreen.classList.add('hidden');
         window.setTimeout(() => {
           awarenessPointsButton.blur();
@@ -5708,7 +5858,6 @@
           }
         }, 0);
         if (state.pausedForAwareness && state.started && !state.gameOver) {
-          clearActiveInputState();
           state.pausedForAwareness = false;
           state.paused = false;
           state.lastTime = performance.now();
