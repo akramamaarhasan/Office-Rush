@@ -61,6 +61,8 @@
         background: linear-gradient(180deg, #1f2d3a 0%, #0d141b 100%);
         box-shadow:
           0 0 0 4px var(--pixel-shadow),
+          -3px 0 12px rgba(103, 232, 255, 0.18),
+          3px 0 12px rgba(103, 232, 255, 0.18),
           0 18px 0 rgba(0,0,0,0.35),
           0 0 26px rgba(103, 232, 255, 0.12);
       }
@@ -338,7 +340,7 @@
       .game-area {
         position: absolute;
         inset: 0;
-        overflow: hidden;
+        overflow: visible;
         touch-action: manipulation;
         -webkit-user-select: none;
         user-select: none;
@@ -348,24 +350,36 @@
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 42px;
+        bottom: 0;
         z-index: 25;
         display: none;
-        gap: 8px;
-        align-items: end;
-        justify-content: space-between;
-        padding: 0 10px;
+        height: 0;
+        pointer-events: none;
+      }
+
+      #mobile-drop-button,
+      #mobile-jump-button {
+        position: absolute;
+        bottom: 38px !important;
+        width: 70px;
+        height: 42px;
+        pointer-events: auto;
         box-sizing: border-box;
+        margin: 0;
+      }
+
+      #mobile-drop-button {
+        left: 16px;
       }
 
       #mobile-jump-button {
-        margin-right: 1px;
+        right: 8px;
       }
 
       .mobile-movement-button {
         appearance: none;
-        width: 58px;
-        height: 50px;
+        width: 70px;
+        height: 42px;
         border: 3px solid #bfe6ff;
         border-radius: 8px;
         background: rgba(13, 23, 34, 0.92);
@@ -378,6 +392,9 @@
         touch-action: none;
         -webkit-user-select: none;
         user-select: none;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
         box-shadow: 0 0 0 3px #1c2b3d, 0 4px 0 rgba(0, 0, 0, 0.35);
       }
 
@@ -1281,10 +1298,10 @@
       .ground {
         position: absolute;
         left: 0;
-        right: 0;
+        right: -7px;
         bottom: 0;
         height: 30px;
-        background: #0f172a;
+        background: transparent;
         border-top: 4px solid #6ee7f9;
         box-shadow: none;
         z-index: 5;
@@ -1293,7 +1310,7 @@
       .ground::before {
         content: "";
         position: absolute;
-        inset: 0;
+        inset: 0 7px 0 0;
         background:
           repeating-linear-gradient(
             to right,
@@ -1875,9 +1892,32 @@
         align-items: center;
         justify-content: center;
         z-index: 30;
-        background: rgba(30, 36, 46, 0.65);
-        backdrop-filter: blur(4px);
+        background: transparent;
         transition: opacity 0.2s ease;
+      }
+
+      #pause-screen {
+        position: absolute;
+        inset: -6px -8px -6px -6px;
+        margin: 0;
+        padding: 0;
+        z-index: 60;
+      }
+
+      #pause-screen:not(.hidden) {
+        background: rgba(18, 24, 32, 0.46);
+        backdrop-filter: blur(4px);
+        box-shadow: inset 0 0 0 0 transparent;
+      }
+
+      #start-screen:not(.hidden),
+      #awareness-screen:not(.hidden),
+      #shop-screen:not(.hidden),
+      #how-to-play-screen:not(.hidden),
+      #game-over-screen:not(.hidden) {
+        inset: -6px -8px -6px -6px;
+        background: rgba(18, 24, 32, 0.46);
+        backdrop-filter: blur(4px);
       }
 
       .screen.hidden {
@@ -1914,6 +1954,7 @@
 
       .panel {
         position: relative;
+        z-index: 2;
         text-align: center;
         padding: 0.6rem 0.7rem 0.7rem;
         border-radius: 0;
@@ -2733,24 +2774,44 @@
         }
 
         .mobile-movement-controls {
-          display: flex;
+          display: block;
           left: 0;
           right: 0;
-          bottom: 36px;
-          gap: 6px;
-          padding: 0 8px;
-          justify-content: space-between;
+          bottom: 0;
+          height: 0;
+          gap: 0;
+          padding: 0;
+          justify-content: unset;
+        }
+
+        #mobile-drop-button,
+        #mobile-jump-button {
+          position: absolute;
+          bottom: 38px !important;
+          width: 70px;
+          height: 42px;
+          border-width: 2px;
+          box-sizing: border-box;
+          margin: 0;
+          box-shadow: 0 0 0 2px #1c2b3d, 0 3px 0 rgba(0, 0, 0, 0.35);
+        }
+
+        #mobile-drop-button {
+          left: 16px;
         }
 
         #mobile-jump-button {
-          margin-right: 1px;
+          right: 8px;
         }
 
         .mobile-movement-button {
-          width: 52px;
+          width: 70px;
           height: 42px;
           border-width: 2px;
           font-size: 0.55rem;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
           box-shadow: 0 0 0 2px #1c2b3d, 0 3px 0 rgba(0, 0, 0, 0.35);
         }
       }
@@ -3324,18 +3385,6 @@
         </div>
       </div>
 
-      <!-- Pause Screen -->
-      <div class="screen hidden" id="pause-screen">
-        <div class="panel">
-          <h1>Game Paused</h1>
-          <p class="tagline">Take a coffee break</p>
-          <div class="actions">
-            <button id="resume-button" class="action-btn" type="button">Resume</button>
-            <button id="quit-to-menu-button" class="action-btn secondary" type="button">Main Menu</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Game Over Screen -->
       <div class="screen hidden" id="game-over-screen">
         <div class="panel">
@@ -3357,6 +3406,17 @@
           </div>
         </div>
       </div>
+
+      <!-- Pause Screen -->
+      <div class="screen hidden" id="pause-screen">
+        <div class="panel">
+          <h1>Game Paused</h1>
+          <p class="tagline">Take a coffee break</p>
+          <div class="actions">
+            <button id="resume-button" class="action-btn" type="button">Resume</button>
+            <button id="quit-to-menu-button" class="action-btn secondary" type="button">Main Menu</button>
+          </div>
+        </div>
       </div>
     </div>
 
