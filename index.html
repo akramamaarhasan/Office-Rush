@@ -330,6 +330,40 @@
         user-select: none;
       }
 
+      .mobile-movement-controls {
+        position: absolute;
+        right: 12px;
+        bottom: 42px;
+        z-index: 25;
+        display: none;
+        gap: 8px;
+        align-items: end;
+      }
+
+      .mobile-movement-button {
+        appearance: none;
+        width: 58px;
+        height: 50px;
+        border: 3px solid #bfe6ff;
+        border-radius: 8px;
+        background: rgba(13, 23, 34, 0.92);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.62rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        box-shadow: 0 0 0 3px #1c2b3d, 0 4px 0 rgba(0, 0, 0, 0.35);
+      }
+
+      .mobile-movement-button:active {
+        transform: translateY(3px);
+        box-shadow: 0 0 0 3px #1c2b3d, 0 1px 0 rgba(0, 0, 0, 0.35);
+      }
+
       button {
         -webkit-user-select: none;
         user-select: none;
@@ -2459,7 +2493,7 @@
         .how-to-play-panel {
           width: min(94%, 420px);
           max-height: calc(100% - 24px);
-          overflow-y: auto;
+          overflow: hidden;
           padding: 0.8rem 0.7rem 0.85rem;
         }
 
@@ -2480,6 +2514,31 @@
 
         .awareness-countdown {
           font-size: clamp(4.5rem, 25vw, 7rem);
+        }
+
+        .mobile-movement-controls {
+          display: flex;
+        }
+
+        .character-preview {
+          transform: scale(0.72);
+          transform-origin: center;
+          margin: -18px 0 -14px;
+        }
+
+        .customization-stack {
+          gap: 3px;
+          margin-bottom: 0.3rem;
+        }
+
+        .swatch-grid {
+          gap: 3px;
+        }
+
+        .swatch-btn {
+          min-height: 22px;
+          padding-top: 3px;
+          padding-bottom: 3px;
         }
       }
 
@@ -2569,15 +2628,40 @@
         .panel,
         .how-to-play-panel {
           max-height: calc(100% - 16px);
-          overflow-y: auto;
+          overflow: hidden;
           padding: 0.55rem 0.65rem 0.6rem;
         }
 
         #start-screen .actions {
-          position: sticky;
-          bottom: 0;
-          padding-top: 0.45rem;
-          background: #0d1620;
+          gap: 0.3rem;
+        }
+
+        #start-screen .character-preview {
+          display: none;
+        }
+
+        #start-screen .customization-stack {
+          gap: 2px;
+          margin-bottom: 0.25rem;
+        }
+
+        #start-screen .swatch-grid {
+          gap: 2px;
+        }
+
+        #start-screen .swatch-btn {
+          min-height: 20px;
+          padding-top: 2px;
+          padding-bottom: 2px;
+          font-size: 0.54rem;
+        }
+
+        #start-screen .action-btn {
+          min-width: 0;
+          flex: 1 1 0;
+          min-height: 34px;
+          padding: 0.35rem 0.25rem;
+          font-size: 0.55rem;
         }
 
         .how-to-play-list {
@@ -2587,6 +2671,21 @@
 
         .awareness-countdown {
           font-size: min(24vh, 6rem);
+        }
+
+        .mobile-movement-controls {
+          display: flex;
+          right: 10px;
+          bottom: 36px;
+          gap: 6px;
+        }
+
+        .mobile-movement-button {
+          width: 52px;
+          height: 42px;
+          border-width: 2px;
+          font-size: 0.55rem;
+          box-shadow: 0 0 0 2px #1c2b3d, 0 3px 0 rgba(0, 0, 0, 0.35);
         }
       }
 
@@ -2728,6 +2827,10 @@
       <div class="game-area" id="game-area" aria-label="Office Rush game area">
         <button class="awareness-marker hidden" id="awareness-toggle" type="button" aria-label="Learn obstacle">?</button>
         <div class="awareness-countdown hidden" id="awareness-countdown" aria-live="assertive"></div>
+        <div class="mobile-movement-controls" aria-label="Movement controls">
+          <button class="mobile-movement-button" id="mobile-drop-button" type="button" aria-label="Fast drop">DROP</button>
+          <button class="mobile-movement-button" id="mobile-jump-button" type="button" aria-label="Jump">JUMP</button>
+        </div>
 
         <div class="office-bg">
           <!-- Minimal office atmosphere: ceiling lights only -->
@@ -2961,6 +3064,8 @@
       const auth = getAuth(app);
 
       const gameArea = document.getElementById('game-area');
+      const mobileJumpButton = document.getElementById('mobile-jump-button');
+      const mobileDropButton = document.getElementById('mobile-drop-button');
       const runnerEl = document.getElementById('runner');
       const runnerHairEl = document.getElementById('runner-hair-el');
       const previewRunnerEl = document.getElementById('preview-runner');
@@ -4986,6 +5091,45 @@
           jump(inputSource);
         }
       }
+
+      function setupMobileMovementControls() {
+        if (!mobileJumpButton || !mobileDropButton) return;
+
+        mobileJumpButton.addEventListener('pointerdown', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          mobileJumpButton.setPointerCapture?.(event.pointerId);
+          jump('keyboard');
+        });
+        mobileJumpButton.addEventListener('click', (event) => {
+          if (event.detail !== 0) return;
+          event.preventDefault();
+          jump('keyboard');
+        });
+
+        const stopDrop = (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          mobileDropButton.releasePointerCapture?.(event.pointerId);
+        };
+
+        mobileDropButton.addEventListener('pointerdown', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          mobileDropButton.setPointerCapture?.(event.pointerId);
+          diveDown();
+        });
+        mobileDropButton.addEventListener('click', (event) => {
+          if (event.detail !== 0) return;
+          event.preventDefault();
+          diveDown();
+        });
+        mobileDropButton.addEventListener('pointerup', stopDrop);
+        mobileDropButton.addEventListener('pointercancel', stopDrop);
+        mobileDropButton.addEventListener('pointerleave', stopDrop);
+      }
+
+      setupMobileMovementControls();
 
       function hasSpawnCollision(x, width, otherX, otherWidth, minGap = 0) {
         return x < otherX + otherWidth + minGap && x + width > otherX - minGap;
