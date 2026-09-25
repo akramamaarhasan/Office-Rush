@@ -3433,7 +3433,7 @@
           <p class="personal-best-feedback" id="personal-best-feedback" aria-live="polite"></p>
           
           <div class="leaderboard">
-            <div class="leaderboard-title">Global Leaderboard (Top 10)</div>
+            <div class="leaderboard-title">Global Leaderboard (Top 25)</div>
             <div id="leaderboard-list">Loading scores...</div>
           </div>
 
@@ -3479,6 +3479,7 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       const auth = getAuth(app);
+      const localPlayerIdKey = 'officeRushLocalPlayerId';
 
       const gameShell = document.getElementById('game-shell');
       const gameContent = document.getElementById('game-content');
@@ -3524,6 +3525,7 @@
       const shopGrid = document.getElementById('shop-grid');
       const closeShopButton = document.getElementById('close-shop-button');
       const leaderboardList = document.getElementById('leaderboard-list');
+      const leaderboardDisplayLimit = 25;
 
       let musicEnabled = true;
       let musicInterval = null;
@@ -3544,16 +3546,37 @@
       // value out of another player's leaderboard entry.
       let playerId = null;
 
+      function getOrCreateLocalPlayerId() {
+        try {
+          let storedId = localStorage.getItem(localPlayerIdKey);
+          if (!storedId) {
+            storedId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            localStorage.setItem(localPlayerIdKey, storedId);
+          }
+          return storedId;
+        } catch (error) {
+          return `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        }
+      }
+
       async function ensureAuthenticatedPlayerId() {
+        if (playerId) return playerId;
+
         try {
           const userCredential = await signInAnonymously(auth);
           playerId = userCredential.user.uid;
         } catch (error) {
           console.error('Anonymous sign-in failed, falling back to a local-only id:', error);
-          playerId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          playerId = getOrCreateLocalPlayerId();
+        }
+
+        if (!playerId) {
+          playerId = getOrCreateLocalPlayerId();
         }
         return playerId;
       }
+
+      await ensureAuthenticatedPlayerId();
 
       const hairStyleGrid = document.getElementById('hair-style-grid');
       const hairColorGrid = document.getElementById('hair-color-grid');
@@ -4353,7 +4376,7 @@
         leaderboardRequestInFlight = true;
 
         try {
-          const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(10));
+          const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(leaderboardDisplayLimit));
           const querySnapshot = await getDocs(q);
           const entries = [];
 
@@ -4387,7 +4410,8 @@
       }
 
       function getPersonalBestStorageKey() {
-        return `${personalBestKeyPrefix}${playerId}`;
+        const activePlayerId = playerId || getOrCreateLocalPlayerId();
+        return `${personalBestKeyPrefix}${activePlayerId}`;
       }
 
       function getPersonalBest() {
@@ -5253,6 +5277,10 @@
       }
 
       async function saveScoreToFirebase(name, score) {
+        if (!playerId) {
+          await ensureAuthenticatedPlayerId();
+        }
+
         if (state.scoreSubmitted) return;
 
         // Sanity cap: reject scores no legitimate run could reach. This only blocks
@@ -5307,7 +5335,7 @@
           const mergedEntries = [...leaderboardCache.filter((entry) => entry.id !== savedEntry.id), savedEntry]
             .filter((entry) => Number.isFinite(entry.score))
             .sort((a, b) => b.score - a.score)
-            .slice(0, 10);
+            .slice(0, leaderboardDisplayLimit);
 
           leaderboardCache = mergedEntries;
           leaderboardLastLoadedAt = Date.now();
