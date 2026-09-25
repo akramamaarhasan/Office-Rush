@@ -2516,8 +2516,25 @@
           letter-spacing: 0.04em;
         }
 
+        .awareness-chip {
+          width: 46px;
+          min-width: 46px;
+          height: 48px;
+        }
+
+        .awareness-bulb {
+          width: 30px;
+          height: 35px;
+        }
+
+        .awareness-chip .chip-value {
+          font-size: 0.9rem;
+          top: 48%;
+          letter-spacing: 0;
+        }
+
         .awareness-icon {
-          transform: scale(0.78);
+          transform: none;
         }
 
         .player-stack {
@@ -2685,8 +2702,25 @@
           font-size: 0.9rem;
         }
 
+        .awareness-chip {
+          width: 46px;
+          min-width: 46px;
+          height: 48px;
+        }
+
+        .awareness-bulb {
+          width: 30px;
+          height: 35px;
+        }
+
+        .awareness-chip .chip-value {
+          font-size: 0.9rem;
+          top: 48%;
+          letter-spacing: 0;
+        }
+
         .awareness-icon {
-          transform: scale(0.65);
+          transform: none;
         }
 
         .chip.music-toggle span,
@@ -3378,7 +3412,7 @@
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8595;</span><span class="how-to-play-copy"><strong>Fast Drop:</strong> Hold S or Down Arrow to move down quickly.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">!</span><span class="how-to-play-copy"><strong>Hazards:</strong> Red objects are dangerous. Avoid them.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon coffee-icon" aria-hidden="true"></span><span class="how-to-play-copy"><strong>Coffee:</strong> Collect coffee for 100 points.</span></div>
-            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">?</span><span class="how-to-play-copy"><strong>Awareness:</strong> Tap the ? button on the top right when a green, glowing obstacle appears to learn about it.</span></div>
+            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">?</span><span class="how-to-play-copy"><strong>Awareness:</strong> Tap the "?" button on the top right when a green, glowing obstacle appears to learn about it.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#10074;&#10074;</span><span class="how-to-play-copy"><strong>Pause:</strong> Press P, Escape, or the pause button.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon goal-icon" aria-hidden="true"></span><span class="how-to-play-copy"><strong>Goal:</strong> Survive as long as possible and set the highest score.</span></div>
           </div>
@@ -4574,7 +4608,7 @@
         money: {
           title: 'Money Pickup',
           kind: 'money',
-          effect: 'The floating money is an eye-catching trap; touching it ends the run even though it looks like a reward.',
+          effect: 'Do not be deceived by the floating money; it is an eye-catching trap.',
           example: 'Touching this obstacle ends the run.'
         }
       };
