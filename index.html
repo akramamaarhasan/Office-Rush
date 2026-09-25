@@ -346,6 +346,39 @@
         touch-action: manipulation;
         -webkit-user-select: none;
         user-select: none;
+        --cup-highlight: #fef9f4;
+        --cup-body-color: #e9d8bf;
+        --cup-rim-color: #5a3a22;
+        --cup-lid-color: #8d5c3e;
+        --cup-handle-color: rgba(255, 255, 255, 0.1);
+        --cup-shadow-color: rgba(90, 58, 34, 0.15);
+      }
+
+      .game-area.cup-style-classic {
+        --cup-highlight: #fef9f4;
+        --cup-body-color: #e9d8bf;
+        --cup-rim-color: #5a3a22;
+        --cup-lid-color: #8d5c3e;
+        --cup-handle-color: rgba(255, 255, 255, 0.1);
+        --cup-shadow-color: rgba(90, 58, 34, 0.15);
+      }
+
+      .game-area.cup-style-neon {
+        --cup-highlight: #dcffff;
+        --cup-body-color: #5ee8ff;
+        --cup-rim-color: #0e6f8b;
+        --cup-lid-color: #13a7c6;
+        --cup-handle-color: rgba(170, 247, 255, 0.45);
+        --cup-shadow-color: rgba(17, 149, 185, 0.32);
+      }
+
+      .game-area.cup-style-luxe {
+        --cup-highlight: #fff0fb;
+        --cup-body-color: #ffbfdc;
+        --cup-rim-color: #9d5a8d;
+        --cup-lid-color: #d77eb1;
+        --cup-handle-color: rgba(255, 219, 238, 0.5);
+        --cup-shadow-color: rgba(197, 110, 166, 0.28);
       }
 
       .mobile-movement-controls {
@@ -1497,9 +1530,9 @@
         width: 26px;
         height: 24px;
         border-radius: 0 0 8px 8px;
-        background: linear-gradient(180deg, #fef9f4 0%, #e9d8bf 100%);
-        border: 3px solid #5a3a22;
-        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.5), 0 0 0 3px rgba(90, 58, 34, 0.15), 0 0 10px rgba(255,255,255,0.48), 0 6px 0 rgba(0,0,0,0.2);
+        background: linear-gradient(180deg, var(--cup-highlight) 0%, var(--cup-body-color) 100%);
+        border: 3px solid var(--cup-rim-color);
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.5), 0 0 0 3px var(--cup-shadow-color), 0 0 10px rgba(255,255,255,0.48), 0 6px 0 rgba(0,0,0,0.2);
         z-index: 10;
       }
 
@@ -1511,8 +1544,8 @@
         top: -7px;
         height: 7px;
         border-radius: 7px 7px 0 0;
-        background: linear-gradient(180deg, #8d5c3e 0%, #5a3a22 100%);
-        border: 3px solid #5a3a22;
+        background: linear-gradient(180deg, var(--cup-lid-color) 0%, var(--cup-rim-color) 100%);
+        border: 3px solid var(--cup-rim-color);
         border-bottom: none;
       }
 
@@ -1523,10 +1556,10 @@
         right: -8px;
         width: 9px;
         height: 10px;
-        border: 3px solid #5a3a22;
+        border: 3px solid var(--cup-rim-color);
         border-left: none;
         border-radius: 0 8px 8px 0;
-        background: rgba(255,255,255,0.1);
+        background: var(--cup-handle-color);
       }
 
       .coffee-cup--air {
@@ -4669,14 +4702,14 @@
         {
           id: 'cup-neon',
           category: 'Coffee Cups',
-          name: 'Neon Glow',
+          name: 'Cyan Glow',
           cost: 3,
           type: 'cup'
         },
         {
           id: 'cup-luxe',
           category: 'Coffee Cups',
-          name: 'Luxe Ceramic',
+          name: 'Pink Glow',
           cost: 4,
           type: 'cup'
         }
