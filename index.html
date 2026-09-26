@@ -40,6 +40,8 @@
         min-height: 100%;
         height: 100%;
         overflow-x: hidden;
+        overflow-y: hidden;
+        overscroll-behavior: none;
       }
 
       body {
@@ -71,7 +73,8 @@
       }
 
       .game-shell.theme-sunset {
-        background: linear-gradient(180deg, #273c52 0%, #111a27 100%);
+        background:
+          linear-gradient(180deg, rgba(115, 206, 255, 0.26) 0%, rgba(116, 191, 255, 0.10) 16%, rgba(16, 34, 53, 0.96) 42%, #102235 100%);
       }
 
       .game-shell.theme-midnight {
@@ -83,9 +86,11 @@
       }
 
       .game-shell.theme-particle-dust .office-bg {
-        background:
-          radial-gradient(circle at 50% 18%, rgba(255,255,255,0.13), transparent 32%),
-          linear-gradient(180deg, rgba(15, 32, 44, 0.45), rgba(7, 11, 18, 0.22));
+        background: rgba(16, 31, 44, 0.45);
+      }
+
+      .game-shell.theme-sunset .office-bg {
+        background: rgba(18, 35, 52, 0.7);
       }
 
       .game-shell.theme-particle-dust .dust-particle {
@@ -487,17 +492,125 @@
         inset: 0;
         margin: 0;
         pointer-events: none;
-        background:
-          radial-gradient(circle at 50% 20%, rgba(255,255,255,0.08), transparent 38%),
-          linear-gradient(180deg, rgba(20, 28, 38, 0.45), rgba(7, 11, 18, 0.2));
+        z-index: 0;
+        background: rgba(15, 28, 41, 0.82);
       }
 
       .office-bg::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(65, 217, 255, 0.03), transparent 30%),
-          repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 28px);
+        background: repeating-linear-gradient(
+          90deg,
+          rgba(148, 208, 255, 0.03) 0,
+          rgba(148, 208, 255, 0.03) 1px,
+          transparent 1px,
+          transparent 28px
+        );
+      }
+
+      .game-shell.theme-original .office-bg::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 6%;
+        width: 38%;
+        height: 38%;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at center,
+          rgba(184, 232, 255, 0.15) 0%,
+          rgba(184, 232, 255, 0.08) 24%,
+          rgba(184, 232, 255, 0.04) 46%,
+          transparent 72%
+        );
+        pointer-events: none;
+        filter: blur(10px);
+        opacity: 0.85;
+      }
+
+      .game-shell:not(.theme-original) .office-bg::after {
+        content: none;
+      }
+
+      .sunset-rollercoaster {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1;
+        transition: opacity 0.25s ease;
+      }
+
+      .game-shell.theme-sunset .sunset-rollercoaster {
+        opacity: 0.8;
+      }
+
+      .sunset-rollercoaster .ride-track {
+        fill: none;
+        stroke: color-mix(in srgb, var(--ceiling-light-color) 38%, transparent);
+        stroke-width: 3.5;
+        stroke-linecap: butt;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        shape-rendering: geometricPrecision;
+        filter: drop-shadow(0 0 4px rgba(155, 233, 255, 0.18));
+      }
+
+      .sunset-rollercoaster .ride-track--shadow {
+        stroke: color-mix(in srgb, var(--ceiling-light-color) 18%, transparent);
+        stroke-width: 2.5;
+      }
+
+      .sunset-rollercoaster .support {
+        stroke: color-mix(in srgb, var(--ceiling-light-color) 24%, transparent);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+
+      .sunset-coaster-car {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 3;
+        offset-path: path("M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 980.5 405");
+        offset-rotate: 0deg;
+        animation: sunsetCoasterRide 8s linear infinite;
+        will-change: offset-distance;
+      }
+
+      .game-shell.theme-sunset .sunset-coaster-car {
+        opacity: 1;
+      }
+
+      .sunset-coaster-car__body {
+        position: absolute;
+        inset: 0;
+        border-radius: 2px;
+        background: linear-gradient(180deg, #8fe7ff 0%, #5fc2eb 100%);
+        box-shadow: 0 0 8px rgba(95, 194, 235, 0.7);
+        border: 1px solid rgba(111, 206, 255, 0.9);
+      }
+
+      .sunset-coaster-car__body::before,
+      .sunset-coaster-car__body::after {
+        content: none;
+      }
+
+      @keyframes sunsetCoasterRide {
+        0% {
+          offset-distance: 0%;
+        }
+        100% {
+          offset-distance: 100%;
+        }
       }
 
       .dust-particle {
@@ -1779,7 +1892,7 @@
       }
 
       .awareness-panel {
-        width: min(72%, 360px);
+        width: min(76%, 400px);
       }
 
       .awareness-info {
@@ -3316,9 +3429,14 @@
         </div>
 
         <div class="office-bg">
-          <!-- Minimal office atmosphere: ceiling lights only -->
+          <svg class="sunset-rollercoaster" viewBox="0 0 980 551" preserveAspectRatio="none" aria-hidden="true">
+            <path class="ride-track ride-track--shadow" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 980.5 405" />
+            <path class="ride-track" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 980.5 405" />
+          </svg>
+          <div class="sunset-coaster-car" aria-hidden="true">
+            <div class="sunset-coaster-car__body"></div>
+          </div>
 
-          <!-- Keep the scene minimal with only ceiling lights -->
           <span class="dust-particle dust-particle--constant" style="--dust-top: 6%; --dust-size: 4px; --dust-duration: 26s; --dust-delay: -18s;"></span>
           <span class="dust-particle" style="--dust-top: 14%; --dust-size: 3px; --dust-duration: 39s; --dust-delay: 27s;"></span>
           <span class="dust-particle dust-particle--constant" style="--dust-top: 22%; --dust-size: 3px; --dust-duration: 31s; --dust-delay: -20s;"></span>
