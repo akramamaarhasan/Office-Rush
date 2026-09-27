@@ -69,16 +69,17 @@
       }
 
       .game-shell.theme-original {
-        background: linear-gradient(180deg, #1f2d3a 0%, #0d141b 100%);
+        border: 4px solid #97A8B7;
+        background: linear-gradient(180deg, #1b3044 0%, #0b1b2b 100%);
       }
 
       .game-shell.theme-sunset {
         background:
-          linear-gradient(180deg, rgba(115, 206, 255, 0.26) 0%, rgba(116, 191, 255, 0.10) 16%, rgba(16, 34, 53, 0.96) 42%, #102235 100%);
+          linear-gradient(180deg, rgba(64, 129, 175, 0.18) 0%, rgba(56, 111, 155, 0.07) 16%, rgba(9, 23, 39, 0.98) 42%, #081827 100%);
       }
 
       .game-shell.theme-midnight {
-        background: linear-gradient(180deg, #0f172a 0%, #050b12 100%);
+        background: linear-gradient(180deg, #080f1d 0%, #02060d 100%);
       }
 
       .game-shell.theme-particle-dust {
@@ -90,7 +91,57 @@
       }
 
       .game-shell.theme-sunset .office-bg {
-        background: rgba(18, 35, 52, 0.7);
+        background: rgba(9, 22, 38, 0.82);
+      }
+
+      .game-shell.theme-original .office-bg {
+        background: rgba(10, 26, 43, 0.82);
+      }
+
+      .game-shell.theme-midnight .office-bg {
+        background: rgba(3, 8, 18, 0.82);
+      }
+
+      .game-shell.theme-midnight .dust-particle {
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: none;
+      }
+
+      .game-shell.theme-midnight .dust-particle--constant {
+        opacity: 0.08;
+      }
+
+      .midnight-star {
+        position: absolute;
+        left: var(--star-left);
+        top: var(--star-top);
+        width: var(--star-size, 7px);
+        height: var(--star-size, 7px);
+        display: block;
+        background: color-mix(in srgb, var(--ceiling-light-color) 75%, white);
+        clip-path: polygon(50% 0%, 61% 36%, 100% 36%, 69% 58%, 81% 100%, 50% 74%, 19% 100%, 31% 58%, 0% 36%, 39% 36%);
+        filter: drop-shadow(0 0 5px color-mix(in srgb, var(--ceiling-light-color) 85%, white));
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .game-shell.theme-midnight .midnight-star {
+        left: calc(100% + 16px);
+        opacity: 0.95;
+        will-change: translate, transform, opacity;
+        animation:
+          midnightStarDrift var(--star-drift-duration, 18s) linear var(--star-drift-delay, 0s) infinite,
+          midnightStarTwinkle var(--star-duration, 3.2s) ease-in-out var(--star-delay, 0s) infinite;
+      }
+
+      @keyframes midnightStarDrift {
+        from { left: calc(100% + 16px); }
+        to { left: -16px; }
+      }
+
+      @keyframes midnightStarTwinkle {
+        0%, 100% { transform: scale(0.72); opacity: 0.48; }
+        50% { transform: scale(1); opacity: 1; }
       }
 
       .game-shell.theme-particle-dust .dust-particle {
@@ -546,13 +597,13 @@
       }
 
       .game-shell.theme-sunset .sunset-rollercoaster {
-        opacity: 0.8;
+        opacity: 0.68;
       }
 
       .sunset-rollercoaster .ride-track {
         fill: none;
-        stroke: color-mix(in srgb, var(--ceiling-light-color) 38%, transparent);
-        stroke-width: 3.5;
+        stroke: color-mix(in srgb, var(--ceiling-light-color) 58%, white);
+        stroke-width: 2.5;
         stroke-linecap: butt;
         stroke-linejoin: round;
         vector-effect: non-scaling-stroke;
@@ -561,55 +612,138 @@
       }
 
       .sunset-rollercoaster .ride-track--shadow {
-        stroke: color-mix(in srgb, var(--ceiling-light-color) 18%, transparent);
-        stroke-width: 2.5;
+        stroke: #122536;
+        stroke-width: 7;
+        filter: none;
+      }
+
+      .sunset-rollercoaster .ride-track--lower {
+        stroke-width: 2;
+        filter: none;
       }
 
       .sunset-rollercoaster .support {
-        stroke: color-mix(in srgb, var(--ceiling-light-color) 24%, transparent);
-        stroke-width: 2.5;
-        stroke-linecap: round;
+        fill: none;
+        stroke: color-mix(in srgb, var(--ceiling-light-color) 30%, #203444);
+        stroke-width: 4;
+        stroke-linecap: butt;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+      }
+
+      .sunset-rollercoaster .support-brace {
+        stroke: color-mix(in srgb, var(--ceiling-light-color) 24%, #53646d);
+        stroke-width: 2;
+        opacity: 0.72;
+      }
+
+      .sunset-rollercoaster .track-ties {
+        fill: none;
+        stroke: #e5ad64;
+        stroke-width: 2;
+        stroke-linecap: butt;
+        vector-effect: non-scaling-stroke;
+        clip-path: url(#coaster-track-gap);
       }
 
       .sunset-coaster-car {
         position: absolute;
         left: 0;
         top: 0;
-        width: 24px;
-        height: 24px;
+        width: 38px;
+        height: 22px;
         opacity: 0;
         pointer-events: none;
         z-index: 3;
-        offset-path: path("M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 980.5 405");
-        offset-rotate: 0deg;
-        animation: sunsetCoasterRide 8s linear infinite;
+        offset-path: path("M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 990 405");
+        offset-anchor: 50% 100%;
+        offset-rotate: auto;
+        animation: none;
         will-change: offset-distance;
       }
 
       .game-shell.theme-sunset .sunset-coaster-car {
         opacity: 1;
+        animation: none;
       }
 
       .sunset-coaster-car__body {
         position: absolute;
-        inset: 0;
-        border-radius: 2px;
-        background: linear-gradient(180deg, #8fe7ff 0%, #5fc2eb 100%);
-        box-shadow: 0 0 8px rgba(95, 194, 235, 0.7);
-        border: 1px solid rgba(111, 206, 255, 0.9);
+        inset: 7px 1px 6px;
+        border-radius: 4px 4px 2px 2px;
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--ceiling-light-color) 55%, white) 0%,
+          color-mix(in srgb, var(--ceiling-light-color) 70%, black) 100%
+        );
+        box-shadow: 0 0 8px color-mix(in srgb, var(--ceiling-light-color) 70%, transparent);
+        border: 2px solid #10202e;
       }
 
-      .sunset-coaster-car__body::before,
       .sunset-coaster-car__body::after {
-        content: none;
+        content: "";
+        position: absolute;
+        left: 4px;
+        bottom: -6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10202e;
+        box-shadow: 20px 0 0 -1px #10202e, 20px 0 0 var(--ceiling-light-color), inset 0 0 0 1px var(--ceiling-light-color);
+      }
+
+      .sunset-coaster-rider {
+        position: absolute;
+        bottom: 3px;
+        z-index: 1;
+        width: 7px;
+        height: 6px;
+        border: 1px solid #10202e;
+        border-bottom: 0;
+        border-radius: 3px 3px 0 0;
+        background: color-mix(in srgb, var(--ceiling-light-color) 85%, #10202e);
+      }
+
+      .sunset-coaster-rider:first-child {
+        left: 7px;
+      }
+
+      .sunset-coaster-rider:last-child {
+        left: 20px;
+      }
+
+      .sunset-coaster-rider::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -5px;
+        width: 5px;
+        height: 5px;
+        border: 1px solid #10202e;
+        border-radius: 50%;
+        background: #f0d2a4;
+      }
+
+      .sunset-coaster-rider:last-child::before {
+        background: #d9b38a;
       }
 
       @keyframes sunsetCoasterRide {
         0% {
           offset-distance: 0%;
+          opacity: 1;
+        }
+        50% {
+          offset-distance: 100%;
+          opacity: 1;
+        }
+        50.1% {
+          offset-distance: 100%;
+          opacity: 0;
         }
         100% {
           offset-distance: 100%;
+          opacity: 0;
         }
       }
 
@@ -718,6 +852,27 @@
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.45), 0 0 8px var(--ceiling-light-glow), inset 0 2px 4px rgba(0, 0, 0, 0.08);
         border: 1px solid rgba(141, 146, 152, 0.9);
+      }
+
+      .game-shell.theme-original .light-fixture {
+        background: linear-gradient(
+          180deg,
+          #ffffff 0%,
+          #ffffff 18%,
+          color-mix(in srgb, var(--ceiling-light-color) 35%, white) 18%,
+          color-mix(in srgb, var(--ceiling-light-color) 35%, white) 45%,
+          var(--ceiling-light-color) 45%,
+          var(--ceiling-light-color) 75%,
+          color-mix(in srgb, var(--ceiling-light-color) 55%, black) 75%,
+          color-mix(in srgb, var(--ceiling-light-color) 55%, black) 100%
+        );
+        border-color: rgba(201, 232, 242, 0.92);
+        height: 20px;
+        transform: scaleY(1.12);
+        box-shadow:
+          0 0 16px rgba(255, 255, 255, 0.62),
+          0 0 24px var(--ceiling-light-glow),
+          inset 0 2px 4px rgba(0, 0, 0, 0.06);
       }
 
       .light-fixture::before {
@@ -1473,7 +1628,7 @@
       .ground {
         position: absolute;
         left: 0;
-        right: -7px;
+        right: 0;
         bottom: 0;
         height: 30px;
         background: transparent;
@@ -1485,15 +1640,17 @@
       .ground::before {
         content: "";
         position: absolute;
-        inset: 0 7px 0 0;
-        background:
-          repeating-linear-gradient(
-            to right,
-            #111827 0,
-            #111827 18px,
-            #1f2937 18px,
-            #1f2937 36px
-          );
+        inset: 0;
+        background: repeating-linear-gradient(
+          to right,
+          #111827 0 18px,
+          transparent 18px 18.5px,
+          #1f2937 18.5px 36.5px,
+          transparent 36.5px 37px
+        );
+        background-size: 37px 100%;
+        background-repeat: repeat-x;
+        background-position: left center;
         opacity: 1;
       }
 
@@ -3039,9 +3196,9 @@
       }
 
       .game-shell {
-        width: min(92vw, 980px, calc(78vh * 16 / 9));
+        width: min(92vw, 980px, calc(78vh * 988 / 559.25));
         height: auto;
-        aspect-ratio: 16 / 9;
+        aspect-ratio: 988 / 559.25;
         min-height: 0;
         max-height: none;
         overflow: hidden;
@@ -3066,19 +3223,19 @@
         .game-shell {
           width: min(
             calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 20px),
-            calc((100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) * 16 / 9)
+            calc((100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) * 988 / 559.25)
           );
           height: auto;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: 988 / 559.25;
         }
 
         .game-shell:has(.screen:not(.hidden)) {
           width: min(
             calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 20px),
-            calc((100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) * 16 / 9)
+            calc((100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) * 988 / 559.25)
           );
           height: auto;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: 988 / 559.25;
         }
 
         .mobile-movement-controls {
@@ -3408,7 +3565,7 @@
                 <button class="chip pause-toggle" id="pause-toggle" type="button" aria-label="Pause game" aria-pressed="false">
                   <span aria-hidden="true"></span>
                 </button>
-                <button class="chip awareness-help-toggle" id="awareness-help-toggle" type="button" aria-label="Press to learn about a nearby green-glowing obstacle" data-tooltip="Wait for a green-glowing obstacle, then press this button or the obstacle to learn about it.">
+                <button class="chip awareness-help-toggle" id="awareness-help-toggle" type="button" aria-label="Press to learn about a nearby green-glowing obstacle" data-tooltip="When an obstacle glows green, press I, this button, or the obstacle to learn about it.">
                   <span aria-hidden="true">?</span>
                 </button>
                 <button class="chip music-toggle" id="music-toggle" type="button" aria-label="Mute sound" aria-pressed="false">
@@ -3430,11 +3587,26 @@
 
         <div class="office-bg">
           <svg class="sunset-rollercoaster" viewBox="0 0 980 551" preserveAspectRatio="none" aria-hidden="true">
-            <path class="ride-track ride-track--shadow" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 980.5 405" />
-            <path class="ride-track" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 980.5 405" />
+            <defs>
+              <clipPath id="coaster-track-gap">
+                <path d="M 0 405 C 105 360 160 280 255 265 C 335 252 410 330 480 315 C 560 300 610 210 692 230 C 778 250 842 315 990 405 L 990 410 C 842 320 778 255 692 235 C 610 215 560 305 480 320 C 410 335 335 257 255 270 C 160 285 105 365 0 410 Z" />
+              </clipPath>
+            </defs>
+            <g class="coaster-supports">
+              <path class="support" d="M 105 346 V 521 M 239 271 V 521 M 388 301 V 521 M 536 295 V 521 M 685 231 V 521 M 823 298 V 521 M 934 373 V 521" />
+              <path class="support support-brace" d="M -29 425 L 105 521 M -29 521 L 105 425 M 105 425 L 239 521 M 105 521 L 239 425 M 239 425 L 388 521 M 239 521 L 388 425 M 388 425 L 536 521 M 388 521 L 536 425 M 536 425 L 685 521 M 536 521 L 685 425 M 685 425 L 823 521 M 685 521 L 823 425 M 823 425 L 934 521 M 823 521 L 934 425 M 934 425 L 1068 521 M 934 521 L 1068 425" />
+            </g>
+            <path class="ride-track ride-track--shadow" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 990 405" />
+            <path class="ride-track ride-track--shadow" transform="translate(0 5)" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 990 405" />
+            <path class="track-ties" d="M 20.7 395.4 L 22.8 399.4 M 57.2 374.9 L 59.4 378.5 M 92.1 351.8 L 94.4 355.1 M 126.2 327.3 L 128.6 330.6 M 161 303.6 L 163.2 307.1 M 197.9 282.9 L 199.8 287 M 237.7 268.5 L 238.9 273.2 M 280 263.7 L 279.8 268.7 M 321.7 271.7 L 320.4 276.2 M 361.3 286.5 L 359.5 290.8 M 400 302.7 L 398.3 307 M 439.7 314.8 L 438.8 319.6 M 480.4 314.9 L 481.4 319.7 M 519.4 301.3 L 521.4 305.3 M 555.2 279.9 L 557.5 283.4 M 589.9 256.3 L 592.2 259.8 M 627 235.9 L 628.8 240.2 M 668.8 227.1 L 668.8 232.1 M 710.6 235.1 L 709.2 239.7 M 749.8 251 L 747.8 255.1 M 786.7 271.4 L 784.5 275.1 M 822.1 294.2 L 819.8 297.6 M 856.9 317.8 L 854.6 321.2 M 891.6 341.5 L 889.3 344.9 M 926.5 364.8 L 924.2 368.3 M 961.8 387.5 L 959.5 391.1" />
+            <path class="ride-track" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 990 405" />
+            <path class="ride-track ride-track--lower" transform="translate(0 5)" d="M 0 405 C 105 360, 160 280, 255 265 C 335 252, 410 330, 480 315 C 560 300, 610 210, 692 230 C 778 250, 842 315, 990 405" />
           </svg>
           <div class="sunset-coaster-car" aria-hidden="true">
-            <div class="sunset-coaster-car__body"></div>
+            <div class="sunset-coaster-car__body">
+              <span class="sunset-coaster-rider"></span>
+              <span class="sunset-coaster-rider"></span>
+            </div>
           </div>
 
           <span class="dust-particle dust-particle--constant" style="--dust-top: 6%; --dust-size: 4px; --dust-duration: 26s; --dust-delay: -18s;"></span>
@@ -3449,6 +3621,29 @@
           <span class="dust-particle" style="--dust-top: 78%; --dust-size: 4px; --dust-duration: 42s; --dust-delay: 33s;"></span>
           <span class="dust-particle dust-particle--constant" style="--dust-top: 86%; --dust-size: 4px; --dust-duration: 33s; --dust-delay: -25s;"></span>
           <span class="dust-particle" style="--dust-top: 94%; --dust-size: 3px; --dust-duration: 37s; --dust-delay: 12s;"></span>
+          <span class="dust-particle" style="--dust-top: 10%; --dust-size: 2px; --dust-duration: 32s; --dust-delay: -14s;"></span>
+          <span class="dust-particle dust-particle--constant" style="--dust-top: 26%; --dust-size: 2px; --dust-duration: 27s; --dust-delay: -9s;"></span>
+          <span class="dust-particle" style="--dust-top: 42%; --dust-size: 2px; --dust-duration: 41s; --dust-delay: 19s;"></span>
+          <span class="dust-particle dust-particle--constant" style="--dust-top: 58%; --dust-size: 2px; --dust-duration: 30s; --dust-delay: -18s;"></span>
+          <span class="dust-particle" style="--dust-top: 74%; --dust-size: 2px; --dust-duration: 38s; --dust-delay: 7s;"></span>
+          <span class="dust-particle dust-particle--constant" style="--dust-top: 90%; --dust-size: 2px; --dust-duration: 35s; --dust-delay: -28s;"></span>
+          <span class="midnight-star" style="--star-left: 12%; --star-start: 0vw; --star-top: 11%; --star-size: 10px; --star-drift-duration: 14s; --star-drift-delay: 0s; --star-duration: 3.4s; --star-delay: -1.1s;"></span>
+          <span class="midnight-star" style="--star-left: 28%; --star-start: 0vw; --star-top: 52%; --star-size: 5px; --star-drift-duration: 20s; --star-drift-delay: 0s; --star-duration: 2.8s; --star-delay: -2.2s;"></span>
+          <span class="midnight-star" style="--star-left: 44%; --star-start: 0vw; --star-top: 17%; --star-size: 6px; --star-drift-duration: 20s; --star-drift-delay: 2.4s; --star-duration: 3.8s; --star-delay: -0.6s;"></span>
+          <span class="midnight-star" style="--star-left: 61%; --star-start: 0vw; --star-top: 48%; --star-size: 12px; --star-drift-duration: 23s; --star-drift-delay: 3.6s; --star-duration: 3.1s; --star-delay: -1.8s;"></span>
+          <span class="midnight-star" style="--star-left: 76%; --star-start: 0vw; --star-top: 21%; --star-size: 5px; --star-drift-duration: 20s; --star-drift-delay: -10s; --star-duration: 2.6s; --star-delay: -0.9s;"></span>
+          <span class="midnight-star" style="--star-left: 87%; --star-start: 0vw; --star-top: 42%; --star-size: 9px; --star-drift-duration: 19s; --star-drift-delay: 6s; --star-duration: 3.6s; --star-delay: -2.7s;"></span>
+          <span class="midnight-star" style="--star-left: 36%; --star-start: 0vw; --star-top: 62%; --star-size: 5px; --star-drift-duration: 22s; --star-drift-delay: 7.2s; --star-duration: 2.9s; --star-delay: -1.4s;"></span>
+          <span class="midnight-star" style="--star-left: 68%; --star-start: 0vw; --star-top: 72%; --star-size: 6px; --star-drift-duration: 15s; --star-drift-delay: 8.4s; --star-duration: 3.3s; --star-delay: -2.5s;"></span>
+          <span class="midnight-star" style="--star-left: 20%; --star-start: 0vw; --star-top: 74%; --star-size: 4px; --star-drift-duration: 18s; --star-drift-delay: 9.6s; --star-duration: 2.5s; --star-delay: -1.7s;"></span>
+          <span class="midnight-star" style="--star-left: 52%; --star-start: 0vw; --star-top: 44%; --star-size: 5px; --star-drift-duration: 21s; --star-drift-delay: 10.8s; --star-duration: 3.7s; --star-delay: -0.8s;"></span>
+          <span class="midnight-star" style="--star-left: 82%; --star-start: 0vw; --star-top: 56%; --star-size: 4px; --star-drift-duration: 16s; --star-drift-delay: 12s; --star-duration: 2.9s; --star-delay: -2.1s;"></span>
+          <span class="midnight-star" style="--star-left: 8%; --star-start: 0vw; --star-top: 78%; --star-size: 10px; --star-drift-duration: 24s; --star-drift-delay: 13.2s; --star-duration: 3.5s; --star-delay: -1.2s;"></span>
+          <span class="midnight-star" style="--star-left: 48%; --star-start: 0vw; --star-top: 88%; --star-size: 4px; --star-drift-duration: 17s; --star-drift-delay: 14.4s; --star-duration: 2.7s; --star-delay: -2.4s;"></span>
+          <span class="midnight-star" style="--star-left: 93%; --star-start: 0vw; --star-top: 68%; --star-size: 8px; --star-drift-duration: 20s; --star-drift-delay: 15.6s; --star-duration: 3.2s; --star-delay: -0.5s;"></span>
+          <span class="midnight-star" style="--star-left: 18%; --star-start: 0vw; --star-top: 84%; --star-size: 5px; --star-drift-duration: 19s; --star-drift-delay: 2.8s; --star-duration: 3s; --star-delay: -1.6s;"></span>
+          <span class="midnight-star" style="--star-left: 58%; --star-start: 0vw; --star-top: 94%; --star-size: 7px; --star-drift-duration: 22s; --star-drift-delay: 11.6s; --star-duration: 3.6s; --star-delay: -2s;"></span>
+          <span class="midnight-star" style="--star-left: 80%; --star-start: 0vw; --star-top: 68%; --star-size: 4px; --star-drift-duration: 16s; --star-drift-delay: 5.6s; --star-duration: 2.8s; --star-delay: -0.7s;"></span>
         </div>
 
         <div class="runner arcade-sprite style-normal" id="runner" aria-label="Player character">
@@ -3542,9 +3737,9 @@
 
             <!-- Ceiling Light Color Picker -->
             <div>
-              <div class="custom-field-label">Ceiling Light Colour:</div>
+              <div class="custom-field-label">Ambiance Colour:</div>
               <div class="color-picker-panel">
-                <div class="color-slider" id="ceiling-light-slider" aria-label="Ceiling light color picker" tabindex="0">
+                <div class="color-slider" id="ceiling-light-slider" aria-label="Ambiance color picker" tabindex="0">
                   <div class="color-slider-knob" id="ceiling-light-knob"></div>
                 </div>
                 <div class="color-preview-swatch" id="ceiling-light-preview" aria-hidden="true"></div>
@@ -3596,7 +3791,7 @@
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#8595;</span><span class="how-to-play-copy"><strong>Fast Drop:</strong> Hold S or Down Arrow to move down quickly.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">!</span><span class="how-to-play-copy"><strong>Hazards:</strong> Red objects are dangerous. Avoid them.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon coffee-icon" aria-hidden="true"></span><span class="how-to-play-copy"><strong>Coffee:</strong> Collect coffee for 100 points.</span></div>
-            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">?</span><span class="how-to-play-copy"><strong>Awareness:</strong> Tap the "?" button on the top right when a green, glowing obstacle appears to learn about it.</span></div>
+            <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">?</span><span class="how-to-play-copy"><strong>Awareness:</strong> When an obstacle glows green, press I, tap the "?" button, or tap the obstacle to learn about it.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon" aria-hidden="true">&#10074;&#10074;</span><span class="how-to-play-copy"><strong>Pause:</strong> Press P, Escape, or the pause button.</span></div>
             <div class="how-to-play-item"><span class="how-to-play-icon goal-icon" aria-hidden="true"></span><span class="how-to-play-copy"><strong>Goal:</strong> Survive as long as possible and set the highest score.</span></div>
           </div>
@@ -3668,6 +3863,9 @@
       const gameShell = document.getElementById('game-shell');
       const gameContent = document.getElementById('game-content');
       const gameArea = document.getElementById('game-area');
+      const sunsetCoasterCar = document.querySelector('.sunset-coaster-car');
+      const sunsetCoasterTrack = document.querySelector('.sunset-rollercoaster .ride-track:not(.ride-track--shadow)');
+      const midnightStars = document.querySelectorAll('.midnight-star');
       const mobileJumpButton = document.getElementById('mobile-jump-button');
       const mobileDropButton = document.getElementById('mobile-drop-button');
       const runnerEl = document.getElementById('runner');
@@ -3719,6 +3917,13 @@
       const MAX_MUSIC_GAIN = 0.16;
       let animationFrameId = null;
       let obstacleCountAnimationId = null;
+      let coasterPhysicsFrameId = null;
+      let coasterPathLength = 0;
+      let coasterTrackMinY = 0;
+      let coasterTrackMaxY = 0;
+      let coasterPathDistance = 0;
+      let coasterHiddenRemaining = 0;
+      let coasterLastTimestamp = null;
       let awarenessCountdownTimer = null;
       let awarenessHelpTooltipTimer = null;
       const rememberedUsernameKey = 'officeRushUsername';
@@ -4830,16 +5035,16 @@
           type: 'theme'
         },
         {
-          id: 'theme-sunset',
+          id: 'theme-midnight',
           category: 'Office Themes',
-          name: 'Sunset Office',
+          name: 'Midnight Office',
           cost: 5,
           type: 'theme'
         },
         {
-          id: 'theme-midnight',
+          id: 'theme-sunset',
           category: 'Office Themes',
-          name: 'Midnight Office',
+          name: 'Roller Coaster Office',
           cost: 5,
           type: 'theme'
         },
@@ -5363,8 +5568,16 @@
       function applyShopSelections() {
         const selections = getShopSelections();
         const shell = document.getElementById('game-shell');
+        const wasMidnightTheme = shell.classList.contains('theme-midnight');
+        const wasSunsetTheme = shell.classList.contains('theme-sunset');
         shell.classList.remove('theme-original', 'theme-sunset', 'theme-midnight', 'theme-particle-dust', 'theme-forest');
         shell.classList.add(selections.theme);
+        if (!wasMidnightTheme && selections.theme === 'theme-midnight') {
+          restartMidnightStars();
+        }
+        if (!wasSunsetTheme && selections.theme === 'theme-sunset') {
+          restartSunsetCoasterCar();
+        }
 
         runnerEl.classList.remove('outfit-executive', 'outfit-emerald');
         runnerEl.classList.add(selections.outfit);
@@ -5559,6 +5772,127 @@
         runnerEl.classList.remove('is-jumping', 'is-double-jumping');
       }
 
+      function resetSunsetCoasterPhysics() {
+        coasterPathDistance = 0;
+        coasterHiddenRemaining = 0;
+        coasterLastTimestamp = null;
+      }
+
+      function resetSunsetCoasterCar() {
+        if (!sunsetCoasterCar) return;
+        resetSunsetCoasterPhysics();
+        sunsetCoasterCar.style.animation = 'none';
+        sunsetCoasterCar.style.offsetDistance = '0%';
+        sunsetCoasterCar.style.opacity = '0';
+      }
+
+      function restartSunsetCoasterCar() {
+        if (!sunsetCoasterCar) return;
+        resetSunsetCoasterPhysics();
+        sunsetCoasterCar.style.animation = 'none';
+        sunsetCoasterCar.style.offsetDistance = '0%';
+        sunsetCoasterCar.style.opacity = '0';
+        void sunsetCoasterCar.offsetWidth;
+        sunsetCoasterCar.style.animation = '';
+        sunsetCoasterCar.style.offsetDistance = '';
+        sunsetCoasterCar.style.opacity = '';
+      }
+
+      function resetMidnightStars() {
+        restartMidnightStars();
+      }
+
+      function restartMidnightStars() {
+        const starDuration = 24;
+        midnightStars.forEach((star, index) => {
+          const randomTop = 11 + Math.random() * 83;
+          const phaseDelay = -(index * starDuration / midnightStars.length);
+          star.style.setProperty('--star-top', `${randomTop.toFixed(2)}%`);
+          star.style.setProperty('--star-start', '0vw');
+          star.style.setProperty('--star-drift-duration', `${starDuration}s`);
+          star.style.setProperty('--star-drift-delay', `${phaseDelay.toFixed(2)}s`);
+          star.style.animation = 'none';
+          star.style.translate = '0 0';
+          star.style.opacity = '0';
+          void star.offsetWidth;
+          star.style.animation = '';
+          star.style.translate = '';
+          star.style.opacity = '';
+        });
+      }
+
+      function updateSunsetCoasterPhysics(timestamp) {
+        coasterPhysicsFrameId = requestAnimationFrame(updateSunsetCoasterPhysics);
+
+        if (!sunsetCoasterCar || !sunsetCoasterTrack) return;
+
+        if (!coasterPathLength) {
+          coasterPathLength = sunsetCoasterTrack.getTotalLength();
+          coasterTrackMinY = Infinity;
+          coasterTrackMaxY = -Infinity;
+          for (let sampleIndex = 0; sampleIndex <= 100; sampleIndex += 1) {
+            const samplePoint = sunsetCoasterTrack.getPointAtLength(
+              coasterPathLength * (sampleIndex / 100)
+            );
+            coasterTrackMinY = Math.min(coasterTrackMinY, samplePoint.y);
+            coasterTrackMaxY = Math.max(coasterTrackMaxY, samplePoint.y);
+          }
+        }
+
+        if (!coasterLastTimestamp) {
+          coasterLastTimestamp = timestamp;
+          return;
+        }
+
+        const delta = Math.min(timestamp - coasterLastTimestamp, 80);
+        coasterLastTimestamp = timestamp;
+        const isRollerCoasterTheme = gameShell.classList.contains('theme-sunset');
+
+        if (!isRollerCoasterTheme) {
+          resetSunsetCoasterCar();
+          return;
+        }
+
+        if (state.gameOver || (state.started && state.paused)) {
+          return;
+        }
+
+        if (coasterHiddenRemaining > 0) {
+          coasterHiddenRemaining = Math.max(0, coasterHiddenRemaining - delta);
+          if (coasterHiddenRemaining === 0) {
+            coasterPathDistance = 0;
+            sunsetCoasterCar.style.offsetDistance = '0%';
+          }
+          sunsetCoasterCar.style.opacity = '0';
+          return;
+        }
+
+        const currentPoint = sunsetCoasterTrack.getPointAtLength(coasterPathDistance);
+        const heightRange = Math.max(1, coasterTrackMaxY - coasterTrackMinY);
+        const heightRatio = (currentPoint.y - coasterTrackMinY) / heightRange;
+        const speedMultiplier = 0.45 + Math.max(0, Math.min(1, heightRatio)) * 1.05;
+        const baseSpeed = coasterPathLength / 8000;
+
+        coasterPathDistance += baseSpeed * speedMultiplier * delta;
+
+        if (coasterPathDistance >= coasterPathLength) {
+          coasterPathDistance = coasterPathLength;
+          coasterHiddenRemaining = 8000;
+          sunsetCoasterCar.style.offsetDistance = '100%';
+          sunsetCoasterCar.style.opacity = '0';
+          return;
+        }
+
+        sunsetCoasterCar.style.offsetDistance = `${(coasterPathDistance / coasterPathLength) * 100}%`;
+        sunsetCoasterCar.style.opacity = '1';
+      }
+
+      function startSunsetCoasterPhysics() {
+        if (coasterPhysicsFrameId === null) {
+          coasterPhysicsFrameId = requestAnimationFrame(updateSunsetCoasterPhysics);
+        }
+      }
+
       function resetGameState() {
         if (awarenessCountdownTimer) {
           clearTimeout(awarenessCountdownTimer);
@@ -5602,6 +5936,8 @@
         scoreValue.classList.remove('score-milestone-blink');
         runnerEl.classList.remove('runner--exploding');
         runnerEl.style.transform = 'translate3d(0, 0, 0)';
+        resetSunsetCoasterCar();
+        resetMidnightStars();
         pauseScreen.classList.add('hidden');
         updateHud();
       }
@@ -5641,6 +5977,8 @@
         gameOverScreen.classList.add('hidden');
         state.lastTime = performance.now();
         syncRunnerAnimationState();
+        restartSunsetCoasterCar();
+        restartMidnightStars();
 
         stopMenuMusic();
         ensureMusicEngine();
@@ -6387,6 +6725,7 @@
         state.paused = false;
         stopVisibleLoop();
         syncRunnerAnimationState();
+        resetSunsetCoasterCar();
         stopArcadeMusic();
 
         playHitSound();
@@ -6771,14 +7110,7 @@
           }
         }, 0);
         if (state.pausedForAwareness && state.started && !state.gameOver) {
-          state.pausedForAwareness = false;
-          state.paused = false;
-          state.lastTime = performance.now();
-          syncRunnerAnimationState();
-          startVisibleLoop();
-          if (musicEnabled) {
-            startArcadeMusic();
-          }
+          startAwarenessCountdown();
           return;
         }
         if (state.started) {
@@ -6863,6 +7195,22 @@
           return;
         }
 
+        if (event.code === 'KeyI') {
+          const eventUiTarget = event.target instanceof Element
+            ? event.target.closest('button, input, textarea, select, .screen, .panel')
+            : null;
+          const focusedUiTarget = document.activeElement?.closest('button, input, textarea, select, .screen, .panel');
+          if (!event.repeat && state.started && !state.paused && !state.gameOver && !eventUiTarget && !focusedUiTarget) {
+            const awarenessObstacle = getVisibleAwarenessObstacle();
+            if (isAwarenessObstacleInFrame(awarenessObstacle)) {
+              event.preventDefault();
+              playSelectSound();
+              openAwarenessMode(awarenessObstacle);
+            }
+          }
+          return;
+        }
+
         if (isJumpAction) {
           const eventUiTarget = event.target instanceof Element
             ? event.target.closest('button, input, textarea, select, .screen, .panel')
@@ -6940,6 +7288,8 @@
       if (musicEnabled) {
         startMenuMusic();
       }
+      restartMidnightStars();
+      startSunsetCoasterPhysics();
       startVisibleLoop();
     </script>
   </body>
