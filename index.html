@@ -7330,6 +7330,7 @@
       renderShop();
       updateMusicToggleLabel();
       updateHud();
+      // Keep Firebase latency from delaying the initial menu render.
       ensureAuthenticatedPlayerId().then(() => {
         updateMenuPersonalBest();
         syncPersonalBestFromCloud(state.username);
