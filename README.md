@@ -2,7 +2,7 @@
 
 Office Rush is a browser game set in a stylized office environment where players dodge workplace chaos, survive as long as possible, build score, and compete on a live leaderboard.
 
-This project is a complete playable static web game and portfolio piece, combining responsive UI, interactive controls, custom character styling, a live leaderboard, a shop system, and an educational awareness mechanic built around office hazards.
+This project is a complete playable static web game and portfolio piece, combining responsive UI, interactive controls, custom character styling, a live leaderboard, a shop system, and an educational awareness mechanic built around office hazards. The project uses Firebase for leaderboard and player data flow.
 
 ## How to Run
 
