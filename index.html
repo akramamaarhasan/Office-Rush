@@ -150,19 +150,21 @@
       }
 
       .game-content {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
-        position: relative;
         margin: 0;
-        left: 0;
-        top: 0;
+        transform: none;
+        transform-origin: center center;
       }
 
       @media (min-width: 901px) {
         .game-content {
-          width: 980px;
-          height: 551.25px;
-          transform-origin: top left;
+          width: 100%;
+          height: 100%;
+          transform: none;
+          transform-origin: center center;
         }
       }
 
@@ -3993,11 +3995,12 @@
 
       function resizeDesktopGameContent() {
         if (!gameShell || !gameContent) return;
-        const scale = Math.min(
-          gameShell.clientWidth / 980,
-          gameShell.clientHeight / 551.25
-        );
-        gameContent.style.transform = `scale(${Math.max(0, scale)})`;
+        gameContent.style.width = '100%';
+        gameContent.style.height = '100%';
+        gameContent.style.left = '0';
+        gameContent.style.top = '0';
+        gameContent.style.transform = 'none';
+        gameContent.style.transformOrigin = 'center center';
       }
 
       window.addEventListener('resize', resizeDesktopGameContent);
