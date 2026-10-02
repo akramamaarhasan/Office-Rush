@@ -3908,6 +3908,7 @@
       let musicInterval = null;
       let musicGainNode = null;
       let activeMusicMode = null;
+      let hasFadedInInitialMenuMusic = false;
       const activeMusicSources = new Set();
       const MAX_MUSIC_GAIN = 0.16;
       let animationFrameId = null;
@@ -4447,9 +4448,16 @@
         musicToggle.setAttribute('aria-pressed', String(isMuted));
       }
 
-      function applyMusicVolume() {
+      function applyMusicVolume(fadeIn = false) {
         if (musicGainNode && audioCtx && musicEnabled) {
-          musicGainNode.gain.setTargetAtTime(MAX_MUSIC_GAIN, audioCtx.currentTime, 0.08);
+          const now = audioCtx.currentTime;
+          if (fadeIn) {
+            musicGainNode.gain.cancelScheduledValues(now);
+            musicGainNode.gain.setValueAtTime(0, now);
+            musicGainNode.gain.linearRampToValueAtTime(MAX_MUSIC_GAIN, now + 0.7);
+          } else {
+            musicGainNode.gain.setTargetAtTime(MAX_MUSIC_GAIN, now, 0.08);
+          }
         }
       }
 
@@ -4555,7 +4563,8 @@
 
         playNextMenuStep();
         musicInterval = setInterval(playNextMenuStep, 220);
-        applyMusicVolume();
+        applyMusicVolume(!hasFadedInInitialMenuMusic);
+        hasFadedInInitialMenuMusic = true;
       }
 
       function startArcadeMusic() {
