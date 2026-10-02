@@ -3304,6 +3304,14 @@
           padding: 0.6rem 0.7rem 0.7rem;
         }
 
+        #awareness-screen .awareness-panel {
+          width: min(76%, 400px);
+        }
+
+        #shop-screen .shop-panel {
+          width: min(64%, 320px);
+        }
+
         h1 {
           font-size: clamp(1.2rem, 2vw, 1.8rem);
         }
@@ -3475,7 +3483,7 @@
         }
 
         #shop-screen .shop-panel {
-          width: min(94%, 600px);
+          width: min(64%, 320px);
         }
       }
 
@@ -3490,7 +3498,7 @@
         }
 
         #shop-screen .shop-panel {
-          width: min(94%, 600px);
+          width: min(64%, 320px);
         }
       }
     </style>
@@ -4454,7 +4462,12 @@
           if (fadeIn) {
             musicGainNode.gain.cancelScheduledValues(now);
             musicGainNode.gain.setValueAtTime(0, now);
-            musicGainNode.gain.linearRampToValueAtTime(MAX_MUSIC_GAIN, now + 0.7);
+            const fadeCurve = new Float32Array(33);
+            for (let index = 0; index < fadeCurve.length; index += 1) {
+              const progress = index / (fadeCurve.length - 1);
+              fadeCurve[index] = MAX_MUSIC_GAIN * progress * progress * (3 - 2 * progress);
+            }
+            musicGainNode.gain.setValueCurveAtTime(fadeCurve, now, 1.4);
           } else {
             musicGainNode.gain.setTargetAtTime(MAX_MUSIC_GAIN, now, 0.08);
           }
