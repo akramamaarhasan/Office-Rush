@@ -1231,7 +1231,7 @@
         height: 16px;
         transform: translateX(-50%);
         border-radius: 55% 55% 35% 35%;
-        background: #47266a;
+        background: #111111;
         transition: background-color 0.2s ease;
         pointer-events: none;
       }
@@ -3621,7 +3621,7 @@
           <span class="midnight-star" style="--star-left: 80%; --star-start: 0vw; --star-top: 68%; --star-size: 4px; --star-drift-duration: 16s; --star-drift-delay: 5.6s; --star-duration: 2.8s; --star-delay: -0.7s;"></span>
         </div>
 
-        <div class="runner arcade-sprite character-scotty style-normal" id="runner" aria-label="Player character">
+        <div class="runner arcade-sprite character-scotty style-bald" id="runner" aria-label="Player character">
           <div class="runner-head">
             <div class="runner-hair" id="runner-hair-el"></div>
             <div class="runner-face">
@@ -3656,7 +3656,7 @@
           </div>
 
           <div class="character-preview">
-            <div class="runner arcade-sprite preview-runner character-scotty" id="preview-runner" aria-label="Character preview">
+            <div class="runner arcade-sprite preview-runner character-scotty style-bald" id="preview-runner" aria-label="Character preview">
               <div class="runner-head">
                 <div class="runner-hair" id="preview-runner-hair-el"></div>
                 <div class="runner-face">
@@ -3932,6 +3932,7 @@
       // UID is verified server-side by Firestore, so it can't be spoofed by copying a
       // value out of another player's leaderboard entry.
       let playerId = null;
+      let playerIdPromise = null;
 
       function getOrCreateLocalPlayerId() {
         try {
@@ -3948,22 +3949,24 @@
 
       async function ensureAuthenticatedPlayerId() {
         if (playerId) return playerId;
+        if (playerIdPromise) return playerIdPromise;
 
-        try {
-          const userCredential = await signInAnonymously(auth);
-          playerId = userCredential.user.uid;
-        } catch (error) {
-          console.error('Anonymous sign-in failed, falling back to a local-only id:', error);
-          playerId = getOrCreateLocalPlayerId();
-        }
+        playerIdPromise = (async () => {
+          try {
+            const userCredential = await signInAnonymously(auth);
+            playerId = userCredential.user.uid;
+          } catch (error) {
+            console.error('Anonymous sign-in failed, falling back to a local-only id:', error);
+            playerId = getOrCreateLocalPlayerId();
+          }
 
-        if (!playerId) {
-          playerId = getOrCreateLocalPlayerId();
-        }
-        return playerId;
+          if (!playerId) {
+            playerId = getOrCreateLocalPlayerId();
+          }
+          return playerId;
+        })();
+        return playerIdPromise;
       }
-
-      await ensureAuthenticatedPlayerId();
 
       const hairStyleGrid = document.getElementById('hair-style-grid');
       const hairColorGrid = document.getElementById('hair-color-grid');
@@ -5670,6 +5673,7 @@
       // different real players can share the same display name.
       async function syncPersonalBestFromCloud(name) {
         try {
+          if (!playerId) await ensureAuthenticatedPlayerId();
           const cloudQuery = query(collection(db, "leaderboard"), where("playerId", "==", playerId));
           const snapshot = await getDocs(cloudQuery);
           let cloudBest = 0;
@@ -7324,11 +7328,13 @@
       applyCustomization();
       applyShopSelections();
       renderShop();
-      updateMenuPersonalBest();
-      syncPersonalBestFromCloud(state.username);
       updateMusicToggleLabel();
-      fetchLeaderboard();
       updateHud();
+      ensureAuthenticatedPlayerId().then(() => {
+        updateMenuPersonalBest();
+        syncPersonalBestFromCloud(state.username);
+        fetchLeaderboard();
+      });
       if (musicEnabled) {
         const startMenuMusicAfterGesture = () => {
           if (!state.started && !state.paused && !state.gameOver) {
