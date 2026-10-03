@@ -3440,73 +3440,6 @@
         -webkit-text-stroke: 0;
       }
 
-      @media (max-width: 600px) and (orientation: portrait) {
-        #start-screen .panel {
-          width: min(94%, 420px);
-          min-height: calc(100% - 18px);
-          max-height: calc(100% - 16px);
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          overflow-y: auto;
-          padding: clamp(0.45rem, 2.6vw, 0.8rem);
-        }
-
-        #start-screen .character-preview {
-          display: flex;
-          min-height: clamp(145px, 48vw, 166px);
-          margin: 0.15rem 0 0.35rem;
-          transform: none;
-        }
-
-        #start-screen .preview-runner {
-          animation: none;
-          transform: translateX(-50%) scale(1.6);
-        }
-
-        #start-screen .customization-stack {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: clamp(3px, 1.2vw, 7px);
-        }
-
-        #start-screen .customization-stack > div:nth-child(n + 3) {
-          grid-column: 1 / -1;
-        }
-
-        #start-screen .custom-field-label {
-          font-size: clamp(0.52rem, 2.4vw, 0.68rem);
-          margin-bottom: 3px;
-        }
-
-        #start-screen .swatch-btn {
-          min-height: clamp(22px, 7vw, 28px);
-          font-size: clamp(0.56rem, 2.5vw, 0.68rem);
-        }
-
-        #how-to-play-screen .how-to-play-panel {
-          width: min(84%, 420px);
-        }
-
-        #shop-screen .shop-panel {
-          width: min(64%, 320px);
-        }
-      }
-
-      @media (orientation: landscape) and (max-width: 900px) and (max-height: 500px) {
-        #start-screen .action-btn {
-          min-width: 0;
-          flex: 1 1 0;
-        }
-
-        #how-to-play-screen .how-to-play-panel {
-          width: min(84%, 420px);
-        }
-
-        #shop-screen .shop-panel {
-          width: min(64%, 320px);
-        }
-      }
     </style>
   </head>
   <body>
@@ -3995,15 +3928,20 @@
 
       function resizeDesktopGameContent() {
         if (!gameShell || !gameContent) return;
-        gameContent.style.width = '100%';
-        gameContent.style.height = '100%';
+        const scale = Math.min(
+          gameShell.clientWidth / 980,
+          gameShell.clientHeight / 551.25
+        );
+        gameContent.style.width = '980px';
+        gameContent.style.height = '551.25px';
         gameContent.style.left = '0';
         gameContent.style.top = '0';
-        gameContent.style.transform = 'none';
-        gameContent.style.transformOrigin = 'center center';
+        gameContent.style.transform = `scale(${scale})`;
+        gameContent.style.transformOrigin = 'top left';
       }
 
       window.addEventListener('resize', resizeDesktopGameContent);
+      new ResizeObserver(resizeDesktopGameContent).observe(gameShell);
       resizeDesktopGameContent();
 
       function playSelectSound() {
